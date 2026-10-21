@@ -665,6 +665,7 @@ export default function App() {
             Unduhan
           </button>
       </div>
+      )}
 
       {/* Main Content Area */}
       {activeTab === 'logbook' ? (
