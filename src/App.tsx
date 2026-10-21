@@ -63,8 +63,7 @@ import {
 
 export default function App() {
   // Navigation active tab: 'logbook' (Halaman Isi Logbook) or 'report' (Halaman Laporan A4)
-      // Ubah menjadi 'dashboard' (atau 'home', sesuai bawaan asli kode Anda)
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('logbook');
 
   // Period states: default to Triwulan III 2026 as in the user's document example
   const [periodType, setPeriodType] = useState<PeriodType>('triwulan');
@@ -312,7 +311,6 @@ export default function App() {
       });
     } catch (err: any) {
       console.error('Failed to export PDF:', err);
-      // Fallback to window print
       window.print();
     } finally {
       setIsExportingPdf(false);
@@ -517,18 +515,20 @@ export default function App() {
           </div>
         </div>
 
-        {/* Period Selector Bar */}
-        <PeriodSelector
-          periodType={periodType}
-          setPeriodType={setPeriodType}
-          selectedMonth={selectedMonth}
-          setSelectedMonth={setSelectedMonth}
-          selectedQuarter={selectedQuarter}
-          setSelectedQuarter={setSelectedQuarter}
-          selectedYear={selectedYear}
-          setSelectedYear={setSelectedYear}
-          activeSummary={activeSummary}
-        />
+        {/* Period Selector Bar (Hanya tampil di halaman laporan) */}
+        {activeTab === 'report' && (
+          <PeriodSelector
+            periodType={periodType}
+            setPeriodType={setPeriodType}
+            selectedMonth={selectedMonth}
+            setSelectedMonth={setSelectedMonth}
+            selectedQuarter={selectedQuarter}
+            setSelectedQuarter={setSelectedQuarter}
+            selectedYear={selectedYear}
+            setSelectedYear={setSelectedYear}
+            activeSummary={activeSummary}
+          />
+        )}
 
         {/* Secondary Toolbar: On Report View */}
         {activeTab === 'report' && (
@@ -635,37 +635,6 @@ export default function App() {
           </div>
         )}
       </header>
-            
-      <div className="flex flex-wrap justify-center gap-2 p-4 bg-white shadow-sm mb-6 rounded-b-lg">
-          <button 
-            onClick={() => setActiveTab('input')}
-            className={`px-4 py-2 font-semibold rounded-lg transition-colors ${activeTab === 'input' ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-          >
-            Isi Logbook
-          </button>
-          
-          <button 
-            onClick={() => setActiveTab('riwayat')}
-            className={`px-4 py-2 font-semibold rounded-lg transition-colors ${activeTab === 'riwayat' ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-          >
-            Riwayat
-          </button>
-
-          <button 
-            onClick={() => setActiveTab('laporan')}
-            className={`px-4 py-2 font-semibold rounded-lg transition-colors ${activeTab === 'laporan' ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-          >
-            Laporan
-          </button>
-
-          <button 
-            onClick={() => setActiveTab('unduhan')}
-            className={`px-4 py-2 font-semibold rounded-lg transition-colors ${activeTab === 'unduhan' ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-          >
-            Unduhan
-          </button>
-      </div>
-      )}
 
       {/* Main Content Area */}
       {activeTab === 'logbook' ? (
