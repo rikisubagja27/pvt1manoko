@@ -634,6 +634,54 @@ export default function App() {
           </div>
         )}
       </header>
+            {/* Ini adalah bagian atas kode Anda yang sudah ada */}
+      <header className="bg-emerald-600 text-white p-4 shadow-md relative">
+         {/* ... logo dan judul web Anda ... */}
+      </header>
+
+      {/* ======================================================== */}
+      {/* PASTE KODE MENU NAVIGASI YANG BARU TEPAT DI SINI         */}
+      {/* ======================================================== */}
+      <div className="flex flex-wrap justify-center gap-2 p-4 bg-white shadow-sm mb-6 rounded-b-lg">
+          <button 
+            onClick={() => setActiveTab('input')}
+            className={`px-4 py-2 font-semibold rounded-lg transition-colors ${activeTab === 'input' ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+          >
+            Isi Logbook
+          </button>
+          
+          <button 
+            onClick={() => setActiveTab('riwayat')}
+            className={`px-4 py-2 font-semibold rounded-lg transition-colors ${activeTab === 'riwayat' ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+          >
+            Riwayat
+          </button>
+
+          <button 
+            onClick={() => setActiveTab('laporan')}
+            className={`px-4 py-2 font-semibold rounded-lg transition-colors ${activeTab === 'laporan' ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+          >
+            Laporan
+          </button>
+
+          <button 
+            onClick={() => setActiveTab('unduhan')}
+            className={`px-4 py-2 font-semibold rounded-lg transition-colors ${activeTab === 'unduhan' ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+          >
+            Unduhan
+          </button>
+      </div>
+      {/* ======================================================== */}
+
+      {/* Bagian bawahnya adalah isi form Anda yang dipisah berdasarkan tab */}
+      <main className="max-w-4xl mx-auto p-4">
+        
+        {/* Tampilan form akan muncul di sini saat tombol Isi Logbook diklik */}
+        {activeTab === 'input' && (
+           <section>
+             {/* ... form Anda ... */}
+           </section>
+        )}
 
       {/* Main Content Area */}
       {activeTab === 'logbook' ? (
