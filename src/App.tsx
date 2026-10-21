@@ -63,7 +63,8 @@ import {
 
 export default function App() {
   // Navigation active tab: 'logbook' (Halaman Isi Logbook) or 'report' (Halaman Laporan A4)
-    const [activeTab, setActiveTab] = useState('input');
+      // Ubah menjadi 'dashboard' (atau 'home', sesuai bawaan asli kode Anda)
+  const [activeTab, setActiveTab] = useState('dashboard');
 
   // Period states: default to Triwulan III 2026 as in the user's document example
   const [periodType, setPeriodType] = useState<PeriodType>('triwulan');
