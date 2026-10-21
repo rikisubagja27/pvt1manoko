@@ -665,17 +665,6 @@ export default function App() {
             Unduhan
           </button>
       </div>
-      {/* ======================================================== */}
-
-      {/* Bagian bawahnya adalah isi form Anda yang dipisah berdasarkan tab */}
-      <main className="max-w-4xl mx-auto p-4">
-        
-        {/* Tampilan form akan muncul di sini saat tombol Isi Logbook diklik */}
-        {activeTab === 'input' && (
-           <section>
-             {/* ... form Anda ... */}
-           </section>
-        )}
 
       {/* Main Content Area */}
       {activeTab === 'logbook' ? (
