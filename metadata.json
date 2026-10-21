@@ -1,0 +1,8 @@
+{
+  "name": "Remix Logbook Kinerja PVT I Manoko - Laporan A4",
+  "description": "Aplikasi penyusunan dan pencetakan Laporan Kinerja Operasional Kantor KPS PVT I Manoko dengan format standar A4, mendukung periode Bulanan, Triwulan, dan Tahunan secara otomatis.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
