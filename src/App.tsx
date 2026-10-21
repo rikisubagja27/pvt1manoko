@@ -635,14 +635,7 @@ export default function App() {
           </div>
         )}
       </header>
-            {/* Ini adalah bagian atas kode Anda yang sudah ada */}
-      <header className="bg-emerald-600 text-white p-4 shadow-md relative">
-         {/* ... logo dan judul web Anda ... */}
-      </header>
-
-      {/* ======================================================== */}
-      {/* PASTE KODE MENU NAVIGASI YANG BARU TEPAT DI SINI         */}
-      {/* ======================================================== */}
+            
       <div className="flex flex-wrap justify-center gap-2 p-4 bg-white shadow-sm mb-6 rounded-b-lg">
           <button 
             onClick={() => setActiveTab('input')}
