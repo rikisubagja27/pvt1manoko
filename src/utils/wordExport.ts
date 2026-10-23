@@ -27,7 +27,7 @@ export interface ExportWordParams {
   endDateStr: string;
 }
 
-// Helper untuk mengambil file gambar logo dari URL / public folder / base64 menjadi Uint8Array
+// Helper untuk mengambil file gambar logo / foto dari URL / base64 menjadi Uint8Array
 async function fetchImageAsUint8Array(url: string): Promise<Uint8Array | null> {
   try {
     if (url.startsWith('data:image')) {
@@ -66,8 +66,21 @@ export async function buildReportDocument({
   const thinBorder = { style: BorderStyle.SINGLE, size: 4, color: '000000' };
   const cellBorders = { top: thinBorder, bottom: thinBorder, left: thinBorder, right: thinBorder };
 
-  // Memuat logo aplikasi / Kementan dari folder public
-  const logoBuffer = await fetchImageAsUint8Array('/logo-login.png');
+  // Memuat logo: Coba ambil dari localStorage jika user pernah mengunggahnya, atau fallback ke '/logo-login.png'
+  let logoBuffer: Uint8Array | null = null;
+  try {
+    const savedCustomLogo = localStorage.getItem('custom_app_logo');
+    if (savedCustomLogo) {
+      logoBuffer = await fetchImageAsUint8Array(savedCustomLogo);
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  if (!logoBuffer) {
+    logoBuffer = await fetchImageAsUint8Array('/logo-login.png');
+  }
+
   const summarizedPhotos = photos.slice(0, 10);
 
   const table1HeaderRow = new TableRow({
@@ -173,30 +186,30 @@ export async function buildReportDocument({
         children: [
           new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 400, after: 100 }, children: [new TextRun({ text: 'LAPORAN KINERJA', bold: true, font: 'Arial', size: 34 })] }),
           new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 100 }, children: [new TextRun({ text: 'PELAKSANAAN TUGAS OPERASIONAL KANTOR', bold: true, font: 'Arial', size: 30 })] }),
-          new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 600 }, children: [new TextRun({ text: periodTitleCaps, bold: true, font: 'Arial', size: 30 })] }),
+          new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 400 }, children: [new TextRun({ text: periodTitleCaps, bold: true, font: 'Arial', size: 30 })] }),
 
           // Menyisipkan logo secara nyata ke dalam cover dokumen Word
           ...(logoBuffer
             ? [
                 new Paragraph({
                   alignment: AlignmentType.CENTER,
-                  spacing: { before: 200, after: 400 },
+                  spacing: { before: 100, after: 300 },
                   children: [
                     new ImageRun({
                       data: logoBuffer,
-                      transformation: { width: 130, height: 130 },
+                      transformation: { width: 110, height: 110 },
                     }),
                   ],
                 }),
               ]
             : []),
 
-          new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 400, after: 120 }, children: [new TextRun({ text: 'Disusun oleh :', font: 'Arial', size: 26 })] }),
+          new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 200, after: 120 }, children: [new TextRun({ text: 'Disusun oleh :', font: 'Arial', size: 26 })] }),
           new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 60 }, children: [new TextRun({ text: profile.nama.toUpperCase(), bold: true, font: 'Arial', size: 28 })] }),
           new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 200 }, children: [new TextRun({ text: profile.nip, bold: true, font: 'Arial', size: 26 })] }),
-          new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 600 }, children: [new TextRun({ text: profile.jabatan, font: 'Arial', size: 26 })] }),
+          new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 500 }, children: [new TextRun({ text: profile.jabatan, font: 'Arial', size: 26 })] }),
 
-          new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 400, after: 60 }, children: [new TextRun({ text: profile.instansi.toUpperCase(), bold: true, font: 'Arial', size: 26 })] }),
+          new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 300, after: 60 }, children: [new TextRun({ text: profile.instansi.toUpperCase(), bold: true, font: 'Arial', size: 26 })] }),
           new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: String(year), bold: true, font: 'Arial', size: 28 })] }),
           new Paragraph({ children: [new PageBreak()] }),
 
