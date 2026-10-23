@@ -306,36 +306,6 @@ export const LogbookManagerView: React.FC<LogbookManagerViewProps> = ({
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-          <p className="text-xs font-medium text-slate-500">Total Logbook Tercatat</p>
-          <p className="text-2xl font-extrabold text-slate-900 mt-1">{entries.length}</p>
-          <span className="text-[11px] text-emerald-600 font-medium">Catatan harian</span>
-        </div>
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-          <p className="text-xs font-medium text-slate-500">Hadir Kerja (WFO)</p>
-          <p className="text-2xl font-extrabold text-emerald-700 mt-1">
-            {entries.filter((e) => (e.kehadiran || 'WFO') === 'WFO').length}
-          </p>
-          <span className="text-[11px] text-emerald-600 font-medium">Hari efektif di kebun</span>
-        </div>
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-          <p className="text-xs font-medium text-slate-500">Sakit & Cuti</p>
-          <p className="text-2xl font-extrabold text-amber-700 mt-1">
-            {entries.filter((e) => e.kehadiran === 'Sakit' || e.kehadiran === 'Cuti').length}
-          </p>
-          <span className="text-[11px] text-amber-600 font-medium">Hari izin/istirahat</span>
-        </div>
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-          <p className="text-xs font-medium text-slate-500">Foto Sebelum & Sesudah</p>
-          <p className="text-2xl font-extrabold text-teal-700 mt-1">
-            {entries.filter((e) => Boolean(e.fotoSebelumUrl && e.fotoSesudahUrl)).length}
-          </p>
-          <span className="text-[11px] text-teal-600 font-medium">Dokumentasi komparasi</span>
-        </div>
-      </div>
-
       {/* Expandable Input Form */}
       {showAddForm && (
         <div className="bg-white rounded-2xl border-2 border-emerald-500/80 shadow-xl overflow-hidden animate-in fade-in duration-200">
