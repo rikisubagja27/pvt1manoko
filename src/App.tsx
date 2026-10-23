@@ -36,7 +36,6 @@ import { AddPhotoModal } from './components/AddPhotoModal';
 import { SignatureModal } from './components/SignatureModal';
 import { CustomLogoSelectorModal } from './components/CustomLogoSelectorModal';
 import { GoogleDriveSyncModal } from './components/GoogleDriveSyncModal';
-import { exportReportToWord } from './utils/wordExport';
 import { exportReportToPdf } from './utils/pdfExport';
 import { auth, initAuth } from './services/firebaseAuth';
 import {
@@ -54,6 +53,9 @@ import {
   Cloud,
   Download,
 } from 'lucide-react';
+
+// IMPORT FUNGSI WORD YANG BENAR DARI FILE ANDA
+import { generateWordReport } from './utils/wordExport';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('logbook');
@@ -152,10 +154,21 @@ export default function App() {
 
   const handlePrint = () => window.print();
 
+  // FUNGSI EXPORT WORD YANG SUDAH DIPERBAIKI
   const handleExportWord = async () => {
     try {
       setIsExportingWord(true);
-      await exportReportToWord({ periodType, periodTitleCaps, periodLabelNormal, year: selectedYear, profile, activities: activeActivities, photos: activePhotos, endDateStr: defaultEndDate });
+      const wordBlob = await generateWordReport({ periodType, periodTitleCaps, periodLabelNormal, year: selectedYear, profile, activities: activeActivities, photos: activePhotos, endDateStr: defaultEndDate });
+      
+      const fileName = `Laporan_Kinerja_${periodLabelNormal.replace(/\s+/g, '_')}_${profile.nama.replace(/\s+/g, '_')}.docx`;
+      const url = window.URL.createObjectURL(wordBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error('Failed to export Word document:', err);
     } finally {
@@ -276,7 +289,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* Secondary Toolbar: Pemilihan Periode (Hanya tampil di halaman laporan) */}
+        {/* Secondary Toolbar: Pemilihan Periode */}
         {activeTab === 'report' && (
           <PeriodSelector
             periodType={periodType} setPeriodType={setPeriodType} selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} selectedQuarter={selectedQuarter} setSelectedQuarter={setSelectedQuarter} selectedYear={selectedYear} setSelectedYear={setSelectedYear} activeSummary={activeSummary}
