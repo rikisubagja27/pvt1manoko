@@ -51,7 +51,6 @@ import {
   Maximize2,
   FileText,
   ClipboardList,
-  ArrowRight,
   Cloud,
   Download,
 } from 'lucide-react';
@@ -187,7 +186,8 @@ export default function App() {
   const handleSaveSignature = (sigUrl?: string) => setProfile((prev) => ({ ...prev, signatureImage: sigUrl, useDigitalSignature: true }));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0B4F47] to-[#0A192F] text-slate-200 flex flex-col font-sans select-text"
+    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans select-text">
+      
       {/* Top Application Header - Tema Putih Bersih */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm no-print">
         <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6 flex flex-col gap-4">
