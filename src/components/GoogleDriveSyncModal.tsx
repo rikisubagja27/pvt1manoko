@@ -12,8 +12,11 @@ import {
   DriveFileItem,
 } from '../services/googleDriveService';
 import { DailyLogbookEntry, PeriodActivityRow, PeriodType, UserProfile } from '../types';
-import { exportReportToWord } from '../utils/wordExport';
-import { exportReportToPdf } from '../utils/pdfExport';
+
+// INI KUNCI PERBAIKANNYA: Menggunakan nama fungsi yang benar-benar ada di file Anda
+import { generateWordReport } from '../utils/wordExport';
+import { generateReportPdfBlob } from '../utils/pdfExport';
+
 import {
   Cloud,
   CheckCircle2,
@@ -70,7 +73,6 @@ export const GoogleDriveSyncModal: React.FC<GoogleDriveSyncModalProps> = ({
     text: string;
   } | null>(null);
 
-  // Confirmation dialog states for destructive actions
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean;
     title: string;
@@ -188,22 +190,22 @@ export const GoogleDriveSyncModal: React.FC<GoogleDriveSyncModalProps> = ({
       
       const fileName = `Laporan_Kinerja_${periodLabelNormal.replace(/\s+/g, '_')}_${profile.nama.replace(/\s+/g, '_')}.docx`;
       
-      const wordBuffer = await exportReportToWord({
+      // Menggunakan generateWordReport dari file utils Anda
+      const wordBlob = await generateWordReport({
         periodType: activePeriodType,
         periodTitleCaps,
         periodLabelNormal,
         year: selectedYear,
         profile,
         activities,
-        photos: [], // Anda bisa mengirim activePhotos ke sini jika diperlukan dari App.tsx
+        photos: [], 
         endDateStr: defaultEndDate,
-        returnBuffer: true // Menandakan bahwa kita butuh Blob/Buffer, bukan download otomatis
       });
 
       await uploadFileToDrive({
         fileName,
         mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        content: wordBuffer as Blob,
+        content: wordBlob,
         description: `Dokumen Word Laporan Kinerja ${periodLabelNormal} ${selectedYear}`,
       });
 
@@ -231,16 +233,14 @@ export const GoogleDriveSyncModal: React.FC<GoogleDriveSyncModalProps> = ({
 
       const fileName = `Laporan_Kinerja_${periodLabelNormal.replace(/\s+/g, '_')}_${profile.nama.replace(/\s+/g, '_')}.pdf`;
 
-      const pdfBlob = await exportReportToPdf({
-        fileName: fileName,
+      const pdfBlob = await generateReportPdfBlob({
         elementId: 'report-print-container',
-        returnBlob: true // Menandakan bahwa kita butuh Blob, bukan download otomatis
       });
 
       await uploadFileToDrive({
         fileName,
         mimeType: 'application/pdf',
-        content: pdfBlob as Blob,
+        content: pdfBlob,
         description: `Dokumen PDF Laporan Kinerja ${periodLabelNormal} ${selectedYear}`,
       });
 
@@ -260,7 +260,7 @@ export const GoogleDriveSyncModal: React.FC<GoogleDriveSyncModalProps> = ({
     }
   };
 
-  // 4. Restore backup file (with explicit confirmation prompt as required by Skill)
+  // 4. Restore backup file
   const triggerRestorePrompt = (file: DriveFileItem) => {
     setConfirmDialog({
       isOpen: true,
@@ -294,7 +294,7 @@ export const GoogleDriveSyncModal: React.FC<GoogleDriveSyncModalProps> = ({
     });
   };
 
-  // 5. Delete file prompt (with explicit confirmation prompt as required by Skill)
+  // 5. Delete file prompt
   const triggerDeletePrompt = (file: DriveFileItem) => {
     setConfirmDialog({
       isOpen: true,
@@ -429,7 +429,6 @@ export const GoogleDriveSyncModal: React.FC<GoogleDriveSyncModalProps> = ({
                   Dengan menghubungkan Google Drive, seluruh data logbook harian, berkas Word, dan berkas PDF tersimpan aman di penyimpanan cloud Google pribadi Anda.
                 </p>
 
-                {/* Official Material Google Sign In Button */}
                 <button
                   type="button"
                   onClick={handleSignIn}
@@ -437,22 +436,10 @@ export const GoogleDriveSyncModal: React.FC<GoogleDriveSyncModalProps> = ({
                   className="inline-flex items-center space-x-3 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-semibold px-5 py-2.5 rounded-xl shadow-xs hover:shadow-md transition-all cursor-pointer disabled:opacity-50"
                 >
                   <svg className="w-5 h-5 shrink-0" viewBox="0 0 48 48">
-                    <path
-                      fill="#EA4335"
-                      d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
-                    />
-                    <path
-                      fill="#4285F4"
-                      d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
-                    />
-                    <path
-                      fill="#FBBC05"
-                      d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
-                    />
-                    <path
-                      fill="#34A853"
-                      d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
-                    />
+                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
                   </svg>
                   <span className="text-xs font-bold">
                     {isSyncing ? 'Menghubungkan...' : 'Masuk dengan Akun Gmail / Google'}
@@ -664,7 +651,7 @@ export const GoogleDriveSyncModal: React.FC<GoogleDriveSyncModalProps> = ({
         </div>
       </div>
 
-      {/* Confirmation Dialog for Destructive Actions (Skill Requirement) */}
+      {/* Confirmation Dialog */}
       {confirmDialog && confirmDialog.isOpen && (
         <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in">
           <div className="bg-white rounded-xl max-w-md w-full p-5 shadow-2xl border border-slate-200 space-y-4">
