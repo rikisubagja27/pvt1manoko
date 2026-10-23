@@ -76,7 +76,6 @@ export default function App() {
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
   const [isSignatureModalOpen, setIsSignatureModalOpen] = useState(false);
 
-  // Default menggunakan logo LogIn dari public folder
   const [headerLogoUrl, setHeaderLogoUrl] = useState<string>(() => {
     return localStorage.getItem('app_header_logo') || '/logo-login.png';
   });
@@ -214,52 +213,39 @@ export default function App() {
             </div>
           </div>
 
-          {/* Primary View Switcher & Global Actions */}
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          {/* Primary View Switcher & Global Actions with Text Labels */}
+          <div className="flex flex-wrap items-center gap-2">
             
-            {/* BAGIAN PROFIL & CLOUD (Berada di atas pinggir) */}
-            <div className="flex items-center gap-1.5 pr-2 sm:pr-3 border-r border-slate-700">
-              <button
-                type="button"
-                onClick={() => setIsProfileModalOpen(true)}
-                className="flex items-center space-x-1.5 px-2.5 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 hover:text-white rounded-lg border border-slate-600 transition-colors cursor-pointer shadow-sm"
-                title="Edit Profil & Pejabat"
-              >
-                {/* Tampilkan foto profil mini jika ada */}
-                {profile.profileImageUrl ? (
-                  <img src={profile.profileImageUrl} alt="Profil" className="w-4 h-4 rounded-full object-cover border border-emerald-500" />
-                ) : (
-                  <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
-                )}
-                <span className="hidden lg:inline text-xs font-semibold">Profil</span>
-              </button>
+            {/* Tombol Profil */}
+            <button
+              type="button"
+              onClick={() => setIsProfileModalOpen(true)}
+              className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl border border-slate-600 transition-colors cursor-pointer shadow-sm text-xs font-semibold"
+            >
+              {profile.profileImageUrl ? (
+                <img src={profile.profileImageUrl} alt="Profil" className="w-4 h-4 rounded-full object-cover border border-emerald-500" />
+              ) : (
+                <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
+              )}
+              <span>Profil</span>
+            </button>
 
-              <button
-                type="button"
-                onClick={() => setIsGoogleDriveModalOpen(true)}
-                className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg border transition-all cursor-pointer shadow-sm ${
-                  currentUser
-                    ? 'bg-emerald-900/40 hover:bg-emerald-800/60 text-emerald-100 border-emerald-500/50'
-                    : 'bg-slate-800/80 hover:bg-slate-700 text-slate-300 border-slate-600'
-                }`}
-                title="Sinkronisasi Akun Cloud Drive"
-              >
-                {currentUser ? (
-                  <>
-                    <Cloud className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span className="hidden lg:inline text-xs font-semibold text-emerald-300">Drive Aktif</span>
-                  </>
-                ) : (
-                  <>
-                    <Cloud className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-                    <span className="hidden lg:inline text-xs font-semibold">Sync Cloud</span>
-                  </>
-                )}
-              </button>
-            </div>
+            {/* Tombol Cloud Sync */}
+            <button
+              type="button"
+              onClick={() => setIsGoogleDriveModalOpen(true)}
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border transition-all cursor-pointer shadow-sm text-xs font-semibold ${
+                currentUser
+                  ? 'bg-emerald-900/40 hover:bg-emerald-800/60 text-emerald-100 border-emerald-500/50'
+                  : 'bg-slate-800/80 hover:bg-slate-700 text-slate-300 border-slate-600'
+              }`}
+            >
+              <Cloud className={`w-3.5 h-3.5 ${currentUser ? 'text-emerald-400' : 'text-blue-400'} shrink-0`} />
+              <span>{currentUser ? 'Drive Aktif' : 'Sync Cloud'}</span>
+            </button>
 
-            {/* Toggle Tab Isi Logbook / Laporan A4 */}
-            <div className="flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700 shadow-sm">
+            {/* Toggle Tab Isi Logbook / Laporan A4 dengan Keterangan Teks */}
+            <div className="flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700 shadow-sm ml-1">
               <button
                 type="button"
                 onClick={() => setActiveTab('logbook')}
@@ -268,7 +254,7 @@ export default function App() {
                 }`}
               >
                 <ClipboardList className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Isi Logbook</span>
+                <span>Isi Logbook</span>
                 <span className="bg-emerald-950/60 text-emerald-200 px-1.5 py-0.2 rounded-full text-[10px]">
                   {logbookEntries.length}
                 </span>
@@ -282,7 +268,7 @@ export default function App() {
                 }`}
               >
                 <FileText className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Laporan A4</span>
+                <span>Laporan A4</span>
               </button>
             </div>
           </div>
@@ -295,12 +281,12 @@ export default function App() {
           />
         )}
 
-        {/* Secondary Toolbar: On Report View (Export & Editor) */}
+        {/* Secondary Toolbar: Editor & Download/Print Buttons Moved Here */}
         {activeTab === 'report' && (
           <div className="bg-slate-800/90 backdrop-blur-xs px-4 py-2 border-t border-slate-700/60 text-xs">
-            <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
               
-              {/* BAGIAN EDITOR TABEL & FOTO */}
+              {/* Kiri: Tombol Editor Tabel, Foto, Tanda Tangan */}
               <div className="flex flex-wrap items-center gap-1.5">
                 <button
                   type="button"
@@ -308,7 +294,7 @@ export default function App() {
                   className="flex items-center space-x-1.5 px-2.5 py-1.5 bg-slate-700/80 hover:bg-slate-700 text-slate-200 hover:text-white rounded-lg border border-slate-600 transition-colors cursor-pointer"
                 >
                   <ListPlus className="w-3.5 h-3.5 text-cyan-400" />
-                  <span className="hidden sm:inline">Kustom Tabel 1</span>
+                  <span>Kustom Tabel 1</span>
                 </button>
 
                 <button
@@ -317,7 +303,7 @@ export default function App() {
                   className="flex items-center space-x-1.5 px-2.5 py-1.5 bg-slate-700/80 hover:bg-slate-700 text-slate-200 hover:text-white rounded-lg border border-slate-600 transition-colors cursor-pointer"
                 >
                   <Camera className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="hidden sm:inline">Tambah Foto</span>
+                  <span>Tambah Foto</span>
                 </button>
 
                 <button
@@ -326,40 +312,35 @@ export default function App() {
                   className="flex items-center space-x-1.5 px-2.5 py-1.5 bg-slate-700/80 hover:bg-slate-700 text-slate-200 hover:text-white rounded-lg border border-slate-600 transition-colors cursor-pointer"
                 >
                   <PenTool className="w-3.5 h-3.5 text-purple-400" />
-                  <span className="hidden sm:inline">Tanda Tangan</span>
+                  <span>Tanda Tangan</span>
                 </button>
               </div>
 
-              {/* BAGIAN AKSI UNDUH & CETAK */}
-              <div className="flex flex-wrap items-center gap-3 mt-1.5 md:mt-0 pt-2 md:pt-0 border-t md:border-t-0 border-slate-700">
-                <div className="flex items-center gap-1.5 pr-3 md:border-r border-slate-600">
-                  <button type="button" onClick={handleExportWord} disabled={isExportingWord} className="flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-xs hover:shadow-md transition-all cursor-pointer disabled:opacity-50">
-                    <FileDown className="w-4 h-4 text-blue-100" />
+              {/* Kanan: Tombol Word, PDF, Print & Zoom (Dipindah ke sini & tanpa banner bawah) */}
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-center gap-1.5 pr-2 border-r border-slate-600">
+                  <button type="button" onClick={handleExportWord} disabled={isExportingWord} className="flex items-center space-x-1 bg-blue-600 hover:bg-blue-500 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer disabled:opacity-50 shadow-xs">
+                    <FileDown className="w-3.5 h-3.5 text-blue-100" />
                     <span>Word</span>
                   </button>
-                  <button type="button" onClick={handleExportPdf} disabled={isExportingPdf} className="flex items-center space-x-1.5 bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-xs hover:shadow-md transition-all cursor-pointer disabled:opacity-50">
-                    <Download className="w-4 h-4 text-rose-100" />
+                  <button type="button" onClick={handleExportPdf} disabled={isExportingPdf} className="flex items-center space-x-1 bg-rose-600 hover:bg-rose-500 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer disabled:opacity-50 shadow-xs">
+                    <Download className="w-3.5 h-3.5 text-rose-100" />
                     <span>PDF</span>
                   </button>
-                  <button type="button" onClick={() => setTimeout(() => handlePrint(), 100)} className="flex items-center space-x-1.5 bg-slate-700 hover:bg-slate-600 text-slate-100 hover:text-white border border-slate-500 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer">
-                    <Printer className="w-4 h-4" />
-                    <span className="hidden sm:inline">Cetak</span>
+                  <button type="button" onClick={() => setTimeout(() => handlePrint(), 100)} className="flex items-center space-x-1 bg-slate-700 hover:bg-slate-600 text-slate-100 border border-slate-500 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer">
+                    <Printer className="w-3.5 h-3.5" />
+                    <span>Cetak</span>
                   </button>
                 </div>
 
-                <div className="flex items-center space-x-2 text-slate-400">
-                  <span className="hidden md:inline-flex items-center text-[11px] text-slate-300">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 mr-1.5 animate-pulse" />
-                    Total {totalPages} Hal
-                  </span>
-                  <div className="flex items-center space-x-1 bg-slate-900/60 p-0.5 rounded-lg border border-slate-700">
-                    <button type="button" onClick={() => setZoomLevel((prev) => Math.max(50, prev - 10))} className="p-1 hover:text-white rounded hover:bg-slate-700 cursor-pointer" title="Perkecil"><ZoomOut className="w-3.5 h-3.5" /></button>
-                    <span className="text-[11px] font-mono px-1.5 text-slate-200 min-w-10 text-center">{zoomLevel}%</span>
-                    <button type="button" onClick={() => setZoomLevel((prev) => Math.min(150, prev + 10))} className="p-1 hover:text-white rounded hover:bg-slate-700 cursor-pointer" title="Perbesar"><ZoomIn className="w-3.5 h-3.5" /></button>
-                    <button type="button" onClick={() => setZoomLevel(100)} className="p-1 hover:text-white rounded hover:bg-slate-700 cursor-pointer" title="Reset 100%"><Maximize2 className="w-3.5 h-3.5" /></button>
-                  </div>
+                <div className="flex items-center space-x-1 bg-slate-900/60 p-0.5 rounded-lg border border-slate-700">
+                  <button type="button" onClick={() => setZoomLevel((prev) => Math.max(50, prev - 10))} className="p-1 hover:text-white rounded hover:bg-slate-700 cursor-pointer" title="Perkecil"><ZoomOut className="w-3.5 h-3.5" /></button>
+                  <span className="text-[11px] font-mono px-1.5 text-slate-200 min-w-8 text-center">{zoomLevel}%</span>
+                  <button type="button" onClick={() => setZoomLevel((prev) => Math.min(150, prev + 10))} className="p-1 hover:text-white rounded hover:bg-slate-700 cursor-pointer" title="Perbesar"><ZoomIn className="w-3.5 h-3.5" /></button>
+                  <button type="button" onClick={() => setZoomLevel(100)} className="p-1 hover:text-white rounded hover:bg-slate-700 cursor-pointer" title="Reset 100%"><Maximize2 className="w-3.5 h-3.5" /></button>
                 </div>
               </div>
+
             </div>
           </div>
         )}
@@ -374,15 +355,7 @@ export default function App() {
         </main>
       ) : (
         <main className="flex-1 flex flex-col items-center">
-          <div className="w-full bg-emerald-900/40 border-b border-emerald-700/50 py-1.5 px-4 text-center text-xs text-emerald-100 no-print flex items-center justify-center space-x-2">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-            <span>Format Dokumen Laporan Kinerja <strong>A4 Rapih</strong>. Judul kolom: <strong>{periodType === 'bulanan' ? 'Tanggal' : periodType === 'triwulan' ? 'Bulan' : 'Triwulan'}</strong>.</span>
-            <button type="button" onClick={() => setActiveTab('logbook')} className="ml-2 font-bold text-emerald-300 underline hover:text-emerald-100 inline-flex items-center space-x-1 cursor-pointer">
-              <span>Buka Logbook Harian</span>
-              <ArrowRight className="w-3 h-3" />
-            </button>
-          </div>
-
+          {/* Main A4 Document Workspace (Banner hijau bawah sudah dihapus total untuk menghemat ruang) */}
           <div className="w-full py-8 px-2 sm:px-6 overflow-x-auto flex justify-center items-start print:p-0 print:m-0 print:overflow-visible">
             <div id="report-print-container" className="print-area flex flex-col gap-10 items-center transition-transform origin-top print:gap-0 print:block" style={{ transform: zoomLevel !== 100 ? `scale(${zoomLevel / 100})` : undefined }}>
               <ReportCover periodTitleCaps={periodTitleCaps} year={selectedYear} profile={profile} />
