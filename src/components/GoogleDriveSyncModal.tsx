@@ -3,7 +3,6 @@ import { User } from 'firebase/auth';
 import {
   googleSignIn,
   logout,
-  getAccessToken,
 } from '../services/firebaseAuth';
 import {
   uploadFileToDrive,
@@ -13,8 +12,8 @@ import {
   DriveFileItem,
 } from '../services/googleDriveService';
 import { DailyLogbookEntry, PeriodActivityRow, PeriodType, UserProfile } from '../types';
-import { generateWordBlob } from '../utils/wordExport';
-import { generateReportPdfBlob } from '../utils/pdfExport';
+import { exportReportToWord } from '../utils/wordExport';
+import { exportReportToPdf } from '../utils/pdfExport';
 import {
   Cloud,
   CheckCircle2,
@@ -186,23 +185,25 @@ export const GoogleDriveSyncModal: React.FC<GoogleDriveSyncModalProps> = ({
     try {
       setIsSyncing(true);
       setSyncStatusMsg(null);
-      const wordBlob = await generateWordBlob({
+      
+      const fileName = `Laporan_Kinerja_${periodLabelNormal.replace(/\s+/g, '_')}_${profile.nama.replace(/\s+/g, '_')}.docx`;
+      
+      const wordBuffer = await exportReportToWord({
         periodType: activePeriodType,
         periodTitleCaps,
         periodLabelNormal,
         year: selectedYear,
         profile,
         activities,
-        photos: [],
+        photos: [], // Anda bisa mengirim activePhotos ke sini jika diperlukan dari App.tsx
         endDateStr: defaultEndDate,
+        returnBuffer: true // Menandakan bahwa kita butuh Blob/Buffer, bukan download otomatis
       });
-
-      const fileName = `Laporan_Kinerja_${periodLabelNormal.replace(/\s+/g, '_')}_${profile.nama.replace(/\s+/g, '_')}.docx`;
 
       await uploadFileToDrive({
         fileName,
         mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        content: wordBlob,
+        content: wordBuffer as Blob,
         description: `Dokumen Word Laporan Kinerja ${periodLabelNormal} ${selectedYear}`,
       });
 
@@ -228,16 +229,18 @@ export const GoogleDriveSyncModal: React.FC<GoogleDriveSyncModalProps> = ({
       setIsSyncing(true);
       setSyncStatusMsg(null);
 
-      const pdfBlob = await generateReportPdfBlob({
-        elementId: 'report-print-container',
-      });
-
       const fileName = `Laporan_Kinerja_${periodLabelNormal.replace(/\s+/g, '_')}_${profile.nama.replace(/\s+/g, '_')}.pdf`;
+
+      const pdfBlob = await exportReportToPdf({
+        fileName: fileName,
+        elementId: 'report-print-container',
+        returnBlob: true // Menandakan bahwa kita butuh Blob, bukan download otomatis
+      });
 
       await uploadFileToDrive({
         fileName,
         mimeType: 'application/pdf',
-        content: pdfBlob,
+        content: pdfBlob as Blob,
         description: `Dokumen PDF Laporan Kinerja ${periodLabelNormal} ${selectedYear}`,
       });
 
