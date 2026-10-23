@@ -50,7 +50,6 @@ import {
   ZoomOut,
   Maximize2,
   FileText,
-  Sparkles,
   ClipboardList,
   ArrowRight,
   Cloud,
@@ -213,38 +212,40 @@ export default function App() {
             </div>
           </div>
 
-          {/* Primary View Switcher & Global Actions with Text Labels */}
+          {/* Primary View Switcher & Global Actions */}
           <div className="flex flex-wrap items-center gap-2">
             
-            {/* Tombol Profil */}
-            <button
-              type="button"
-              onClick={() => setIsProfileModalOpen(true)}
-              className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl border border-slate-600 transition-colors cursor-pointer shadow-sm text-xs font-semibold"
-            >
-              {profile.profileImageUrl ? (
-                <img src={profile.profileImageUrl} alt="Profil" className="w-4 h-4 rounded-full object-cover border border-emerald-500" />
-              ) : (
-                <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
-              )}
-              <span>Profil</span>
-            </button>
+            {/* Tombol Profil (Di dalamnya juga mencakup akses Cloud Sync) */}
+            <div className="flex items-center bg-slate-800/80 p-1 rounded-xl border border-slate-700 shadow-sm gap-1">
+              <button
+                type="button"
+                onClick={() => setIsProfileModalOpen(true)}
+                className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-700/80 hover:bg-slate-700 text-slate-200 hover:text-white rounded-lg transition-colors cursor-pointer text-xs font-semibold"
+              >
+                {profile.profileImageUrl ? (
+                  <img src={profile.profileImageUrl} alt="Profil" className="w-4 h-4 rounded-full object-cover border border-emerald-500" />
+                ) : (
+                  <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
+                )}
+                <span>Profil & Pejabat</span>
+              </button>
 
-            {/* Tombol Cloud Sync */}
-            <button
-              type="button"
-              onClick={() => setIsGoogleDriveModalOpen(true)}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border transition-all cursor-pointer shadow-sm text-xs font-semibold ${
-                currentUser
-                  ? 'bg-emerald-900/40 hover:bg-emerald-800/60 text-emerald-100 border-emerald-500/50'
-                  : 'bg-slate-800/80 hover:bg-slate-700 text-slate-300 border-slate-600'
-              }`}
-            >
-              <Cloud className={`w-3.5 h-3.5 ${currentUser ? 'text-emerald-400' : 'text-blue-400'} shrink-0`} />
-              <span>{currentUser ? 'Drive Aktif' : 'Sync Cloud'}</span>
-            </button>
+              <button
+                type="button"
+                onClick={() => setIsGoogleDriveModalOpen(true)}
+                className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg transition-all cursor-pointer text-xs font-semibold ${
+                  currentUser
+                    ? 'bg-emerald-900/60 hover:bg-emerald-800 text-emerald-200'
+                    : 'bg-slate-700/60 hover:bg-slate-700 text-slate-300'
+                }`}
+                title="Sinkronisasi Cloud Drive"
+              >
+                <Cloud className={`w-3.5 h-3.5 ${currentUser ? 'text-emerald-400' : 'text-blue-400'} shrink-0`} />
+                <span className="hidden sm:inline">{currentUser ? 'Drive Aktif' : 'Sync Cloud'}</span>
+              </button>
+            </div>
 
-            {/* Toggle Tab Isi Logbook / Laporan A4 dengan Keterangan Teks */}
+            {/* Toggle Tab Isi Logbook / Laporan A4 */}
             <div className="flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700 shadow-sm ml-1">
               <button
                 type="button"
@@ -281,7 +282,7 @@ export default function App() {
           />
         )}
 
-        {/* Secondary Toolbar: Editor & Download/Print Buttons Moved Here */}
+        {/* Secondary Toolbar: Editor & Download/Print Buttons */}
         {activeTab === 'report' && (
           <div className="bg-slate-800/90 backdrop-blur-xs px-4 py-2 border-t border-slate-700/60 text-xs">
             <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
@@ -316,7 +317,7 @@ export default function App() {
                 </button>
               </div>
 
-              {/* Kanan: Tombol Word, PDF, Print & Zoom (Dipindah ke sini & tanpa banner bawah) */}
+              {/* Kanan: Tombol Word, PDF, Print & Zoom */}
               <div className="flex flex-wrap items-center gap-2">
                 <div className="flex items-center gap-1.5 pr-2 border-r border-slate-600">
                   <button type="button" onClick={handleExportWord} disabled={isExportingWord} className="flex items-center space-x-1 bg-blue-600 hover:bg-blue-500 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer disabled:opacity-50 shadow-xs">
@@ -355,7 +356,6 @@ export default function App() {
         </main>
       ) : (
         <main className="flex-1 flex flex-col items-center">
-          {/* Main A4 Document Workspace (Banner hijau bawah sudah dihapus total untuk menghemat ruang) */}
           <div className="w-full py-8 px-2 sm:px-6 overflow-x-auto flex justify-center items-start print:p-0 print:m-0 print:overflow-visible">
             <div id="report-print-container" className="print-area flex flex-col gap-10 items-center transition-transform origin-top print:gap-0 print:block" style={{ transform: zoomLevel !== 100 ? `scale(${zoomLevel / 100})` : undefined }}>
               <ReportCover periodTitleCaps={periodTitleCaps} year={selectedYear} profile={profile} />
