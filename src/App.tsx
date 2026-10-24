@@ -69,7 +69,18 @@ export default function App() {
 
   const [isPeriodHidden, setIsPeriodHidden] = useState<boolean>(false);
 
-  const [logbookEntries, setLogbookEntries] = useState<DailyLogbookEntry[]>(DEFAULT_LOGBOOK_ENTRIES);
+  const [logbookEntries, setLogbookEntries] = useState<DailyLogbookEntry[]>(() => {
+  const saved = localStorage.getItem('pvt_logbook_entries');
+  if (saved) {
+    try {
+      return JSON.parse(saved);
+    } catch (e) {
+      console.error('Gagal memuat data tersimpan', e);
+    }
+  }
+  return DEFAULT_LOGBOOK_ENTRIES;
+});
+
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
   const [activitiesOverride, setActivitiesOverride] = useState<Record<string, PeriodActivityRow[]>>({});
   const [extraPhotos, setExtraPhotos] = useState<DocumentationPhoto[]>([]);
