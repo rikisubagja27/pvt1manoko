@@ -36,10 +36,11 @@ import { AddPhotoModal } from './components/AddPhotoModal';
 import { SignatureModal } from './components/SignatureModal';
 import { CustomLogoSelectorModal } from './components/CustomLogoSelectorModal';
 import { GoogleDriveSyncModal } from './components/GoogleDriveSyncModal';
+import { EditReportModal } from './components/EditReportModal'; // <-- Import modal editor laporan baru
 import { exportReportToPdf } from './utils/pdfExport';
 import { auth, initAuth } from './services/firebaseAuth';
 import {
-  Edit3, // Mengganti Printer menjadi Edit3 (Pensil)
+  Edit3,
   FileDown,
   UserCheck,
   ListPlus,
@@ -78,6 +79,7 @@ export default function App() {
   const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
   const [isSignatureModalOpen, setIsSignatureModalOpen] = useState(false);
+  const [isEditReportModalOpen, setIsEditReportModalOpen] = useState(false); // <-- State untuk modal editor laporan
 
   const [headerLogoUrl, setHeaderLogoUrl] = useState<string>(() => {
     return localStorage.getItem('app_header_logo') || '/logo-login.png';
@@ -155,8 +157,6 @@ export default function App() {
   const handleUpdateLogbookEntry = (updated: DailyLogbookEntry) => setLogbookEntries((prev) => prev.map((item) => (item.id === updated.id ? updated : item)));
   const handleDeleteLogbookEntry = (id: string) => setLogbookEntries((prev) => prev.filter((item) => item.id !== id));
 
-  const handlePrint = () => window.print();
-
   const handleExportWord = async () => {
     try {
       setIsExportingWord(true);
@@ -214,7 +214,6 @@ export default function App() {
       <header className="bg-slate-900/40 backdrop-blur-md border-b border-white/10 sticky top-0 z-30 shadow-sm no-print">
         <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6 flex flex-col gap-4">
           
-          {/* BARIS 1: Logo & Judul (Kiri) dan Profil (Kanan) */}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div
@@ -267,7 +266,6 @@ export default function App() {
             </div>
           </div>
 
-          {/* BARIS 2: Tab Toggle & Tombol Hide Periode di Ujung Kanan */}
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center bg-black/20 p-1 rounded-xl border border-white/10 w-fit">
               <button
@@ -309,14 +307,12 @@ export default function App() {
           </div>
         </div>
 
-        {/* Secondary Toolbar: Pemilihan Periode */}
         {activeTab === 'report' && !isPeriodHidden && (
           <PeriodSelector
             periodType={periodType} setPeriodType={setPeriodType} selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} selectedQuarter={selectedQuarter} setSelectedQuarter={setSelectedQuarter} selectedYear={selectedYear} setSelectedYear={setSelectedYear} activeSummary={activeSummary}
           />
         )}
 
-        {/* Secondary Toolbar: Editor & Download/Print Buttons */}
         {activeTab === 'report' && (
           <div className="bg-black/20 px-4 py-2.5 border-t border-white/10 text-xs backdrop-blur-md">
             <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 overflow-x-auto">
@@ -346,13 +342,12 @@ export default function App() {
                   <span>PDF</span>
                 </button>
                 
-                {/* Tombol Cetak dengan Ikon Pensil (Edit3) */}
-                <button type="button" onClick={() => setTimeout(() => handlePrint(), 100)} className="flex items-center space-x-1 bg-slate-700 hover:bg-slate-600 text-slate-100 border border-slate-500 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap">
+                {/* Tombol dengan ikon pensil sekarang membuka Modal Edit Laporan */}
+                <button type="button" onClick={() => setIsEditReportModalOpen(true)} className="flex items-center space-x-1 bg-slate-700 hover:bg-slate-600 text-slate-100 border border-slate-500 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap" title="Edit Teks Laporan">
                   <Edit3 className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Cetak</span>
+                  <span>Edit Teks</span>
                 </button>
 
-                {/* Tombol Zoom di sebelah kanan Cetak */}
                 <div className="flex items-center space-x-1 bg-slate-900/60 p-1 rounded-lg border border-white/10 shadow-sm text-slate-200 ml-1">
                   <button type="button" onClick={() => setZoomLevel((prev) => Math.max(50, prev - 10))} className="p-1 hover:bg-slate-700 rounded cursor-pointer" title="Perkecil"><ZoomOut className="w-3.5 h-3.5" /></button>
                   <span className="text-[11px] font-bold px-1 min-w-8 text-center">{zoomLevel}%</span>
@@ -393,6 +388,7 @@ export default function App() {
       <AddPhotoModal isOpen={isPhotoModalOpen} onClose={() => setIsPhotoModalOpen(false)} onAddPhoto={handleAddPhoto} />
       <SignatureModal isOpen={isSignatureModalOpen} onClose={() => setIsSignatureModalOpen(false)} currentSignatureUrl={profile.signatureImage} onSaveSignature={handleSaveSignature} />
       <CustomLogoSelectorModal isOpen={isLogoModalOpen} onClose={() => setIsLogoModalOpen(false)} currentLogoUrl={headerLogoUrl} onSelectLogo={(logoUrl) => setHeaderLogoUrl(logoUrl)} />
+      <EditReportModal isOpen={isEditReportModalOpen} onClose={() => setIsEditReportModalOpen(false)} periodLabelNormal={periodLabelNormal} year={selectedYear} />
       
       <GoogleDriveSyncModal
         isOpen={isGoogleDriveModalOpen} onClose={() => setIsGoogleDriveModalOpen(false)} currentUser={currentUser} onAuthChange={(user) => setCurrentUser(user)} logbookEntries={logbookEntries} profile={profile} activePeriodType={periodType} periodTitleCaps={periodTitleCaps} periodLabelNormal={periodLabelNormal} selectedYear={selectedYear} activities={activeActivities} defaultEndDate={defaultEndDate} onRestoreEntries={(restoredEntries) => setLogbookEntries(restoredEntries)}
