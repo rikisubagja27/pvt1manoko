@@ -62,7 +62,7 @@ import { generateWordReport } from './utils/wordExport';
 export default function App() {
   const [activeTab, setActiveTab] = useState('logbook');
 
-  const [periodType, setPeriodType] = useState<PeriodType>('triwulan');
+  const [periodType, setPeriodType] = useState<PeriodType>('bulanan');
   const [selectedMonth, setSelectedMonth] = useState<number>(7); 
   const [selectedQuarter, setSelectedQuarter] = useState<number>(3); 
   const [selectedYear, setSelectedYear] = useState<number>(2026);
