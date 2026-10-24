@@ -6,74 +6,103 @@ import {
   Table,
   TableRow,
   TableCell,
-  PageBreak,
-  ImageRun,
   AlignmentType,
   WidthType,
+  BorderStyle,
 } from 'docx';
 
-// 1. Masukkan string Base64 logo Kementan di sini 
-// (Ganti bagian data:image/png;base64,... dengan string base64 logo Anda yang sebenarnya)
-const kementanLogoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
-
-// Fungsi untuk mengubah Base64 menjadi Uint8Array agar bisa dibaca oleh docx
-function base64ToUint8Array(base64: string): Uint8Array {
-  const base64Data = base64.replace(/^data:image\/\w+;base64,/, "");
-  const binaryString = atob(base64Data);
-  const len = binaryString.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-  return bytes;
-}
-
 export async function generateWordReport(data: any): Promise<Blob> {
-  // Mengonversi logo base64 ke format buffer yang aman
-  const logoBuffer = base64ToUint8Array(kementanLogoBase64);
+  // Mengambil data dinamis yang dikirim dari App.tsx
+  const { periodTitleCaps, year, profile, activities } = data;
 
   const doc = new Document({
     sections: [
       {
         properties: {},
         children: [
-          // Paragraf Judul Laporan
+          // 1. Judul Laporan Dinamis
           new Paragraph({
             alignment: AlignmentType.CENTER,
             children: [
               new TextRun({
-                text: "TRIWULAN III TAHUN 2026",
+                text: `LAPORAN KINERJA ${periodTitleCaps}`,
                 bold: true,
                 size: 28,
               }),
             ],
           }),
-
-          new Paragraph({ text: "" }), // Spasi kosong
-
-          // Penyisipan Logo Kementan secara aman menggunakan ImageRun dari buffer
-          new Paragraph({
-            alignment: AlignmentType.CENTER,
-            children: [
-              new ImageRun({
-                data: logoBuffer,
-                transformation: {
-                  width: 100, // Sesuaikan ukuran lebar logo (dalam pixel)
-                  height: 100, // Sesuaikan ukuran tinggi logo (dalam pixel)
-                },
-              }),
-            ],
-          }),
-
-          new Paragraph({ text: "" }), // Spasi kosong
-
-          // Paragraf berikutnya
           new Paragraph({
             alignment: AlignmentType.CENTER,
             children: [
               new TextRun({
-                text: "Disusun oleh: [Nama Anda/Instansi]",
+                text: `TAHUN ${year}`,
+                bold: true,
+                size: 28,
+              }),
+            ],
+          }),
+          new Paragraph({ text: "" }), // Spasi
+
+          // 2. Nama Penyusun Dinamis (Otomatis mengambil dari Profil)
+          new Paragraph({
+            alignment: AlignmentType.CENTER,
+            children: [
+              new TextRun({
+                text: `Disusun oleh: ${profile?.nama || '[Nama Belum Diisi]'}`,
                 size: 24,
+              }),
+            ],
+          }),
+          new Paragraph({
+            alignment: AlignmentType.CENTER,
+            children: [
+              new TextRun({
+                text: `NIP: ${profile?.nip || '-'}`,
+                size: 24,
+              }),
+            ],
+          }),
+          new Paragraph({ text: "" }), // Spasi
+          new Paragraph({ text: "" }), // Spasi
+
+          // 3. Tabel Kegiatan Dasar
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: "Rincian Kegiatan:",
+                bold: true,
+                size: 24,
+              }),
+            ],
+          }),
+          new Paragraph({ text: "" }), // Spasi
+
+          new Table({
+            width: { size: 100, type: WidthType.PERCENTAGE },
+            borders: {
+              top: { style: BorderStyle.SINGLE, size: 1 },
+              bottom: { style: BorderStyle.SINGLE, size: 1 },
+              left: { style: BorderStyle.SINGLE, size: 1 },
+              right: { style: BorderStyle.SINGLE, size: 1 },
+              insideHorizontal: { style: BorderStyle.SINGLE, size: 1 },
+              insideVertical: { style: BorderStyle.SINGLE, size: 1 },
+            },
+            rows: [
+              // Header Tabel
+              new TableRow({
+                children: [
+                  new TableCell({ children: [new Paragraph({ text: "Waktu", alignment: AlignmentType.CENTER })] }),
+                  new TableCell({ children: [new Paragraph({ text: "Uraian Pekerjaan", alignment: AlignmentType.CENTER })] }),
+                ],
+              }),
+              // Isi Tabel Dinamis dari Logbook Anda
+              ...(activities || []).map((act: any) => {
+                return new TableRow({
+                  children: [
+                    new TableCell({ children: [new Paragraph(act.tanggalStr || "-")] }),
+                    new TableCell({ children: [new Paragraph(act.kegiatan || "-")] }),
+                  ],
+                });
               }),
             ],
           }),
