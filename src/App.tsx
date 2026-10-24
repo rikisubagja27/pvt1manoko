@@ -39,7 +39,7 @@ import { GoogleDriveSyncModal } from './components/GoogleDriveSyncModal';
 import { exportReportToPdf } from './utils/pdfExport';
 import { auth, initAuth } from './services/firebaseAuth';
 import {
-  Printer,
+  Edit3, // Mengganti Printer menjadi Edit3 (Pensil)
   FileDown,
   UserCheck,
   ListPlus,
@@ -316,7 +316,7 @@ export default function App() {
           />
         )}
 
-        {/* Secondary Toolbar: Editor & Download/Print Buttons (Zoom digabung di sebelah Cetak) */}
+        {/* Secondary Toolbar: Editor & Download/Print Buttons */}
         {activeTab === 'report' && (
           <div className="bg-black/20 px-4 py-2.5 border-t border-white/10 text-xs backdrop-blur-md">
             <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 overflow-x-auto">
@@ -345,12 +345,14 @@ export default function App() {
                   <Download className="w-3.5 h-3.5 text-rose-100" />
                   <span>PDF</span>
                 </button>
+                
+                {/* Tombol Cetak dengan Ikon Pensil (Edit3) */}
                 <button type="button" onClick={() => setTimeout(() => handlePrint(), 100)} className="flex items-center space-x-1 bg-slate-700 hover:bg-slate-600 text-slate-100 border border-slate-500 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap">
-                  <Printer className="w-3.5 h-3.5" />
+                  <Edit3 className="w-3.5 h-3.5 text-emerald-400" />
                   <span>Cetak</span>
                 </button>
 
-                {/* Tombol Zoom dipindahkan ke samping Cetak */}
+                {/* Tombol Zoom di sebelah kanan Cetak */}
                 <div className="flex items-center space-x-1 bg-slate-900/60 p-1 rounded-lg border border-white/10 shadow-sm text-slate-200 ml-1">
                   <button type="button" onClick={() => setZoomLevel((prev) => Math.max(50, prev - 10))} className="p-1 hover:bg-slate-700 rounded cursor-pointer" title="Perkecil"><ZoomOut className="w-3.5 h-3.5" /></button>
                   <span className="text-[11px] font-bold px-1 min-w-8 text-center">{zoomLevel}%</span>
