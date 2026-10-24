@@ -28,6 +28,7 @@
 @media print {
   html, body {
     background-color: #ffffff !important;
+    background: #ffffff !important;
     margin: 0 !important;
     padding: 0 !important;
     -webkit-print-color-adjust: exact !important;
@@ -35,8 +36,9 @@
   }
 
   /* Hide navigation, toolbars, modals, floating buttons */
-  .no-print {
+  .no-print, header, nav, button, .app-header {
     display: none !important;
+    visibility: hidden !important;
   }
 
   .print-area {
@@ -44,24 +46,39 @@
     padding: 0 !important;
     transform: none !important;
     width: 100% !important;
+    background: white !important;
   }
 
+  /* Pastikan hanya halaman A4 yang aktif yang tercetak putih bersih */
   .a4-page-view {
     width: 210mm !important;
     height: 297mm !important;
     min-height: 297mm !important;
     max-height: 297mm !important;
     margin: 0 !important;
+    padding: 20mm !important;
     box-shadow: none !important;
     border: none !important;
+    background-color: #ffffff !important;
+    background: #ffffff !important;
     page-break-after: always !important;
     break-after: page !important;
     overflow: hidden !important;
   }
 
+  /* Sembunyikan elemen apapun di luar kontainer laporan utama */
+  body > *:not(#root) {
+    display: none !important;
+  }
+
+  #root > *:not(main) {
+    display: none !important;
+  }
+
+  /* ATURAN UTAMA: Mematikan Header & Footer / Watermark Link bawaan browser */
   @page {
     size: A4 portrait;
-    margin: 0;
+    margin: 0mm !important;
   }
 }
 
