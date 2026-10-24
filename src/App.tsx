@@ -54,7 +54,6 @@ import {
   Download,
 } from 'lucide-react';
 
-// IMPORT FUNGSI WORD YANG BENAR DARI FILE ANDA
 import { generateWordReport } from './utils/wordExport';
 
 export default function App() {
@@ -154,7 +153,7 @@ export default function App() {
 
   const handlePrint = () => window.print();
 
-  // FUNGSI EXPORT WORD YANG SUDAH DIPERBAIKI
+  // PERBAIKAN DOWNLOAD WORD UNTUK HP
   const handleExportWord = async () => {
     try {
       setIsExportingWord(true);
@@ -162,15 +161,24 @@ export default function App() {
       
       const fileName = `Laporan_Kinerja_${periodLabelNormal.replace(/\s+/g, '_')}_${profile.nama.replace(/\s+/g, '_')}.docx`;
       const url = window.URL.createObjectURL(wordBlob);
+      
       const a = document.createElement('a');
+      a.style.display = 'none';
       a.href = url;
       a.download = fileName;
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
+      
+      // Memberikan jeda waktu (timeout) agar browser HP sempat memproses download sebelum elemen dihapus
+      setTimeout(() => {
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      }, 500);
+
+    } catch (err: any) {
       console.error('Failed to export Word document:', err);
+      // Menampilkan popup error jika gagal memproses file Word (misal karena gambar base64 tidak valid)
+      alert('Gagal mendownload file Word. Pastikan format logo sudah benar. Error: ' + err.message);
     } finally {
       setIsExportingWord(false);
     }
@@ -199,19 +207,18 @@ export default function App() {
   const handleSaveSignature = (sigUrl?: string) => setProfile((prev) => ({ ...prev, signatureImage: sigUrl, useDigitalSignature: true }));
 
   return (
-        <div className="min-h-screen bg-gradient-to-br from-[#0B4F47] to-[#0A192F] text-slate-200 flex flex-col font-sans select-text">
+    <div className="min-h-screen bg-gradient-to-br from-[#0B4F47] to-[#0A192F] text-slate-200 flex flex-col font-sans select-text">
       
-      {/* Top Application Header - Tema Putih Bersih */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm no-print">
+      {/* Top Application Header - Tema Transparan Menyatu dengan Gradasi */}
+      <header className="bg-slate-900/40 backdrop-blur-md border-b border-white/10 sticky top-0 z-30 shadow-sm no-print">
         <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6 flex flex-col gap-4">
           
           {/* BARIS 1: Logo & Judul (Kiri) dan Profil (Kanan) */}
           <div className="flex items-center justify-between">
-            {/* Logo & Title */}
             <div className="flex items-center space-x-3">
               <div
                 onClick={() => setIsLogoModalOpen(true)}
-                className="relative group w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-white border border-slate-200 hover:border-emerald-500 flex items-center justify-center overflow-hidden shrink-0 cursor-pointer shadow-sm transition-all p-1"
+                className="relative group w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-slate-800/80 border border-white/10 hover:border-emerald-500 flex items-center justify-center overflow-hidden shrink-0 cursor-pointer shadow-sm transition-all p-1"
                 title="Klik untuk mengganti gambar logo"
               >
                 <img src={headerLogoUrl} alt="Logo LogIn" className="w-full h-full object-contain" onError={(e) => { e.currentTarget.src = 'https://via.placeholder.com/150?text=Logo'; }} />
@@ -219,41 +226,40 @@ export default function App() {
               </div>
               <div>
                 <div className="flex items-center space-x-2">
-                  <h1 className="text-sm sm:text-base font-bold tracking-tight text-slate-900 flex items-center gap-1.5">
+                  <h1 className="text-sm sm:text-base font-bold tracking-tight text-white flex items-center gap-1.5">
                     <span>Sistem Logbook Kinerja</span>
                   </h1>
-                  <span className="hidden md:inline-block text-[10px] uppercase font-bold tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-200 px-1.5 py-0.5 rounded-md">Kementan RI</span>
+                  <span className="hidden md:inline-block text-[10px] uppercase font-bold tracking-widest bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-1.5 py-0.5 rounded-md">Kementan RI</span>
                 </div>
-                <p className="text-[11px] text-slate-500 truncate max-w-[200px] sm:max-w-md font-medium">Pusat Pelindungan Varietas Tanaman dan Perizinan Pertanian</p>
+                <p className="text-[11px] text-slate-300 truncate max-w-[200px] sm:max-w-md font-medium">Pusat Pelindungan Varietas Tanaman dan Perizinan Pertanian</p>
               </div>
             </div>
 
-            {/* Aksi Pojok Kanan Atas (Sync & Foto Profil Saja) */}
             <div className="flex items-center gap-2 sm:gap-3">
               <button
                 type="button"
                 onClick={() => setIsGoogleDriveModalOpen(true)}
                 className={`p-2 rounded-full border transition-all cursor-pointer shadow-sm ${
                   currentUser
-                    ? 'bg-emerald-50 border-emerald-200 hover:bg-emerald-100'
-                    : 'bg-white border-slate-200 hover:bg-slate-50'
+                    ? 'bg-emerald-500/20 border-emerald-400/30 hover:bg-emerald-500/30 text-emerald-300'
+                    : 'bg-white/10 border-white/20 hover:bg-white/20 text-slate-200'
                 }`}
                 title={currentUser ? 'Drive Aktif' : 'Sync Cloud Drive'}
               >
-                <Cloud className={`w-4 h-4 sm:w-5 sm:h-5 ${currentUser ? 'text-emerald-600' : 'text-slate-500'}`} />
+                <Cloud className={`w-4 h-4 sm:w-5 sm:h-5 ${currentUser ? 'text-emerald-400' : 'text-slate-300'}`} />
               </button>
 
               <button
                 type="button"
                 onClick={() => setIsProfileModalOpen(true)}
-                className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden border-2 border-slate-200 hover:border-emerald-500 transition-colors shadow-sm cursor-pointer shrink-0"
+                className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden border-2 border-white/20 hover:border-emerald-500 transition-colors shadow-sm cursor-pointer shrink-0"
                 title="Buka Profil & Pejabat"
               >
                 {profile.profileImageUrl ? (
                   <img src={profile.profileImageUrl} alt="Profil" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full bg-slate-100 flex items-center justify-center">
-                    <UserCheck className="w-5 h-5 text-slate-500" />
+                  <div className="w-full h-full bg-slate-700 flex items-center justify-center">
+                    <UserCheck className="w-5 h-5 text-slate-300" />
                   </div>
                 )}
               </button>
@@ -261,17 +267,17 @@ export default function App() {
           </div>
 
           {/* BARIS 2: Tab Toggle (Hanya Isi Logbook & Laporan A4) */}
-          <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 w-fit">
+          <div className="flex items-center bg-black/20 p-1 rounded-xl border border-white/10 w-fit">
             <button
               type="button"
               onClick={() => setActiveTab('logbook')}
               className={`flex items-center space-x-2 px-4 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-                activeTab === 'logbook' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                activeTab === 'logbook' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-300 hover:text-white'
               }`}
             >
               <ClipboardList className="w-4 h-4" />
               <span>Isi Logbook</span>
-              <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${activeTab === 'logbook' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'}`}>
+              <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${activeTab === 'logbook' ? 'bg-emerald-800 text-emerald-100' : 'bg-white/10 text-slate-300'}`}>
                 {logbookEntries.length}
               </span>
             </button>
@@ -280,7 +286,7 @@ export default function App() {
               type="button"
               onClick={() => setActiveTab('report')}
               className={`flex items-center space-x-2 px-4 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-                activeTab === 'report' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                activeTab === 'report' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-300 hover:text-white'
               }`}
             >
               <FileText className="w-4 h-4" />
@@ -298,47 +304,45 @@ export default function App() {
 
         {/* Secondary Toolbar: Editor & Download/Print Buttons */}
         {activeTab === 'report' && (
-          <div className="bg-slate-50 px-4 py-2.5 border-t border-slate-200 text-xs">
+          <div className="bg-black/20 px-4 py-2.5 border-t border-white/10 text-xs backdrop-blur-md">
             <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
               
-              {/* Kiri: Tombol Editor - Light Mode */}
               <div className="flex flex-wrap items-center gap-2">
-                <button type="button" onClick={() => setIsActivityModalOpen(true)} className="flex items-center space-x-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 rounded-lg border border-slate-200 shadow-sm transition-colors cursor-pointer font-medium">
-                  <ListPlus className="w-4 h-4 text-blue-500" />
+                <button type="button" onClick={() => setIsActivityModalOpen(true)} className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 rounded-lg border border-white/10 shadow-sm transition-colors cursor-pointer font-medium">
+                  <ListPlus className="w-4 h-4 text-cyan-400" />
                   <span>Kustom Tabel 1</span>
                 </button>
-                <button type="button" onClick={() => setIsPhotoModalOpen(true)} className="flex items-center space-x-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 rounded-lg border border-slate-200 shadow-sm transition-colors cursor-pointer font-medium">
-                  <Camera className="w-4 h-4 text-emerald-500" />
+                <button type="button" onClick={() => setIsPhotoModalOpen(true)} className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 rounded-lg border border-white/10 shadow-sm transition-colors cursor-pointer font-medium">
+                  <Camera className="w-4 h-4 text-amber-400" />
                   <span>Tambah Foto</span>
                 </button>
-                <button type="button" onClick={() => setIsSignatureModalOpen(true)} className="flex items-center space-x-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 rounded-lg border border-slate-200 shadow-sm transition-colors cursor-pointer font-medium">
-                  <PenTool className="w-4 h-4 text-purple-500" />
+                <button type="button" onClick={() => setIsSignatureModalOpen(true)} className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 rounded-lg border border-white/10 shadow-sm transition-colors cursor-pointer font-medium">
+                  <PenTool className="w-4 h-4 text-purple-400" />
                   <span>Tanda Tangan</span>
                 </button>
               </div>
 
-              {/* Kanan: Tombol Aksi */}
               <div className="flex flex-wrap items-center gap-3">
-                <div className="flex items-center gap-2 pr-3 border-r border-slate-300">
-                  <button type="button" onClick={handleExportWord} disabled={isExportingWord} className="flex items-center space-x-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm disabled:opacity-50 cursor-pointer">
-                    <FileDown className="w-4 h-4" />
+                <div className="flex items-center gap-2 pr-3 border-r border-white/10">
+                  <button type="button" onClick={handleExportWord} disabled={isExportingWord} className="flex items-center space-x-1 bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm disabled:opacity-50 cursor-pointer">
+                    <FileDown className="w-4 h-4 text-blue-100" />
                     <span>Word</span>
                   </button>
-                  <button type="button" onClick={handleExportPdf} disabled={isExportingPdf} className="flex items-center space-x-1 bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm disabled:opacity-50 cursor-pointer">
-                    <Download className="w-4 h-4" />
+                  <button type="button" onClick={handleExportPdf} disabled={isExportingPdf} className="flex items-center space-x-1 bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm disabled:opacity-50 cursor-pointer">
+                    <Download className="w-4 h-4 text-rose-100" />
                     <span>PDF</span>
                   </button>
-                  <button type="button" onClick={() => setTimeout(() => handlePrint(), 100)} className="flex items-center space-x-1 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm cursor-pointer">
-                    <Printer className="w-4 h-4 text-slate-500" />
+                  <button type="button" onClick={() => setTimeout(() => handlePrint(), 100)} className="flex items-center space-x-1 bg-slate-700 hover:bg-slate-600 text-slate-100 border border-slate-500 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm cursor-pointer">
+                    <Printer className="w-4 h-4" />
                     <span>Cetak</span>
                   </button>
                 </div>
 
-                <div className="flex items-center space-x-1 bg-white p-1 rounded-lg border border-slate-200 shadow-sm">
-                  <button type="button" onClick={() => setZoomLevel((prev) => Math.max(50, prev - 10))} className="p-1 hover:bg-slate-100 text-slate-500 rounded cursor-pointer"><ZoomOut className="w-4 h-4" /></button>
-                  <span className="text-[11px] font-bold px-1.5 text-slate-700 min-w-10 text-center">{zoomLevel}%</span>
-                  <button type="button" onClick={() => setZoomLevel((prev) => Math.min(150, prev + 10))} className="p-1 hover:bg-slate-100 text-slate-500 rounded cursor-pointer"><ZoomIn className="w-4 h-4" /></button>
-                  <button type="button" onClick={() => setZoomLevel(100)} className="p-1 hover:bg-slate-100 text-slate-500 rounded cursor-pointer ml-1"><Maximize2 className="w-4 h-4" /></button>
+                <div className="flex items-center space-x-1 bg-slate-900/60 p-1 rounded-lg border border-white/10 shadow-sm text-slate-200">
+                  <button type="button" onClick={() => setZoomLevel((prev) => Math.max(50, prev - 10))} className="p-1 hover:bg-slate-700 rounded cursor-pointer"><ZoomOut className="w-4 h-4" /></button>
+                  <span className="text-[11px] font-bold px-1.5 min-w-10 text-center">{zoomLevel}%</span>
+                  <button type="button" onClick={() => setZoomLevel((prev) => Math.min(150, prev + 10))} className="p-1 hover:bg-slate-700 rounded cursor-pointer"><ZoomIn className="w-4 h-4" /></button>
+                  <button type="button" onClick={() => setZoomLevel(100)} className="p-1 hover:bg-slate-700 rounded cursor-pointer ml-1"><Maximize2 className="w-4 h-4" /></button>
                 </div>
               </div>
             </div>
