@@ -258,9 +258,9 @@ export const LogbookManagerView: React.FC<LogbookManagerViewProps> = ({
         </div>
       </div>
 
-      {/* Expandable Input Form (Ukuran Standar/Semula) */}
+      {/* Expandable Input Form (Kotak Putih Diperbesar Memenuhi Layar) */}
       {showAddForm && (
-        <div className="bg-white rounded-2xl border-2 border-emerald-500/80 shadow-xl overflow-hidden">
+        <div className="w-full bg-white rounded-2xl border-2 border-emerald-500/80 shadow-xl overflow-hidden">
           <div className="bg-emerald-50/80 px-6 py-4 border-b border-emerald-200/80 flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="p-2.5 bg-emerald-600 text-white rounded-xl shadow-xs">
@@ -281,7 +281,7 @@ export const LogbookManagerView: React.FC<LogbookManagerViewProps> = ({
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-6 space-y-5 text-sm">
+          <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-6 text-sm">
             {/* Kehadiran */}
             <div className="bg-slate-50/80 p-4 rounded-xl border border-slate-200 space-y-2.5">
               <label className="block font-bold text-slate-900 text-sm">
@@ -329,7 +329,7 @@ export const LogbookManagerView: React.FC<LogbookManagerViewProps> = ({
               </div>
             </div>
 
-            {/* Tanggal & Waktu */}
+            {/* Tanggal & Waktu (Jam Mulai dan Jam Selesai Disejajarkan ke Samping) */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className="block font-bold text-slate-800 mb-1.5 text-sm">
@@ -346,23 +346,25 @@ export const LogbookManagerView: React.FC<LogbookManagerViewProps> = ({
 
               {kehadiran === 'WFO' ? (
                 <>
-                  <div>
-                    <label className="block font-bold text-slate-800 mb-1.5 text-sm">Jam Mulai</label>
-                    <input
-                      type="time"
-                      value={jamMulai}
-                      onChange={(e) => setJamMulai(e.target.value)}
-                      className="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-slate-900 focus:outline-emerald-600 bg-white text-sm font-medium"
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-bold text-slate-800 mb-1.5 text-sm">Jam Selesai</label>
-                    <input
-                      type="time"
-                      value={jamSelesai}
-                      onChange={(e) => setJamSelesai(e.target.value)}
-                      className="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-slate-900 focus:outline-emerald-600 bg-white text-sm font-medium"
-                    />
+                  <div className="col-span-2 grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block font-bold text-slate-800 mb-1.5 text-sm">Jam Mulai</label>
+                      <input
+                        type="time"
+                        value={jamMulai}
+                        onChange={(e) => setJamMulai(e.target.value)}
+                        className="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-slate-900 focus:outline-emerald-600 bg-white text-sm font-medium"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-800 mb-1.5 text-sm">Jam Selesai</label>
+                      <input
+                        type="time"
+                        value={jamSelesai}
+                        onChange={(e) => setJamSelesai(e.target.value)}
+                        className="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-slate-900 focus:outline-emerald-600 bg-white text-sm font-medium"
+                      />
+                    </div>
                   </div>
                 </>
               ) : (
