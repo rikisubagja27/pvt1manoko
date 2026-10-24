@@ -1,18 +1,34 @@
 import React from 'react';
 import { DocumentationPhoto } from '../types';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Image as ImageIcon } from 'lucide-react';
 
 export interface ReportBab2Table2Props {
   photos: DocumentationPhoto[];
   startPageNumber: number;
-  onDeletePhoto?: (id: string) => void; // Fungsi opsional untuk menghapus foto langsung
+  onDeletePhoto?: (id: string) => void;
+  onUpdatePhoto?: (id: string, newImageUrl: string) => void;
 }
 
 export const ReportBab2Table2: React.FC<ReportBab2Table2Props> = ({
   photos,
   startPageNumber,
   onDeletePhoto,
+  onUpdatePhoto,
 }) => {
+  // Fungsi untuk mengganti foto secara lokal via upload file langsung di baris tabel
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, photoId: string) => {
+    const file = e.target.files?.[0];
+    if (file && onUpdatePhoto) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          onUpdatePhoto(photoId, reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div className="w-[210mm] min-h-[297mm] bg-white text-black p-[20mm] shadow-2xl flex flex-col justify-between font-['Arial'] text-[12pt] leading-relaxed relative box-border print:shadow-none print:w-full print:m-0 print:break-after-page">
       <div>
@@ -38,7 +54,7 @@ export const ReportBab2Table2: React.FC<ReportBab2Table2Props> = ({
             {photos && photos.length > 0 ? (
               photos.map((photo, idx) => (
                 <tr key={photo.id || idx} className="align-top group">
-                  {/* Kolom Gambar */}
+                  {/* Kolom Gambar dengan Tombol Aksi Langsung */}
                   <td className="border border-black p-3 text-center relative">
                     <div className="relative inline-block w-full">
                       <img
@@ -46,23 +62,48 @@ export const ReportBab2Table2: React.FC<ReportBab2Table2Props> = ({
                         alt={photo.title}
                         className="max-h-[220px] w-auto mx-auto object-contain rounded border border-slate-300"
                       />
-                      {/* Tombol Hapus Foto Langsung pada Tampilan */}
-                      {onDeletePhoto && (
-                        <button
-                          type="button"
-                          onClick={() => onDeletePhoto(photo.id)}
-                          className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white p-1.5 rounded-full shadow-md opacity-80 hover:opacity-100 transition-opacity cursor-pointer print:hidden"
-                          title="Hapus foto ini dari laporan"
+                      
+                      {/* Tombol Kontrol (Ganti & Hapus Foto) - Hanya tampil di layar, tersembunyi saat cetak/PDF */}
+                      <div className="absolute top-2 right-2 flex items-center space-x-1 print:hidden">
+                        {/* Tombol Ganti Gambar */}
+                        <label
+                          className="bg-blue-600 hover:bg-blue-700 text-white p-1.5 rounded-full shadow-md opacity-85 hover:opacity-100 transition-opacity cursor-pointer"
+                          title="Ganti foto ini"
                         >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      )}
+                          <ImageIcon className="w-4 h-4" />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => handleFileChange(e, photo.id)}
+                          />
+                        </label>
+
+                        {/* Tombol Hapus Foto */}
+                        {onDeletePhoto && (
+                          <button
+                            type="button"
+                            onClick={() => onDeletePhoto(photo.id)}
+                            className="bg-red-600 hover:bg-red-700 text-white p-1.5 rounded-full shadow-md opacity-85 hover:opacity-100 transition-opacity cursor-pointer"
+                            title="Hapus foto ini"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </td>
 
-                  {/* Kolom Keterangan */}
+                  {/* Kolom Keterangan (Bisa diedit teks keterangannya jika diperlukan) */}
                   <td className="border border-black p-3 space-y-1.5 text-justify">
-                    <p className="font-bold text-slate-900">{photo.title}</p>
+                    <p
+                      contentEditable
+                      suppressContentEditableWarning
+                      className="font-bold text-slate-900 outline-none focus:bg-amber-50 rounded p-0.5"
+                      title="Klik untuk mengedit judul foto"
+                    >
+                      {photo.title}
+                    </p>
                     {photo.dateStr && (
                       <p className="text-[10pt] text-slate-600">
                         📅 {photo.dateStr} {photo.timeStr ? `at ${photo.timeStr}` : ''}
@@ -89,7 +130,7 @@ export const ReportBab2Table2: React.FC<ReportBab2Table2Props> = ({
             ) : (
               <tr>
                 <td colSpan={2} className="border border-black p-6 text-center text-slate-500 italic">
-                  Belum ada foto dokumentasi yang ditambahkan. Gunakan tombol "Tambah Foto" di menu atas untuk memasukkan dokumentasi kegiatan.
+                  Belum ada foto dokumentasi.
                 </td>
               </tr>
             )}
