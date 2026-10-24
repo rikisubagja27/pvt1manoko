@@ -35,7 +35,7 @@
     print-color-adjust: exact !important;
   }
 
-  /* Sembunyikan elemen navigasi, header, dan tombol hanya saat dicetak */
+  /* Sembunyikan navigasi, header, dan tombol saat dicetak */
   .no-print, header, nav, button, .app-header {
     display: none !important;
     visibility: hidden !important;
@@ -49,7 +49,7 @@
     background: white !important;
   }
 
-  /* Pastikan hanya halaman A4 yang aktif yang tercetak putih bersih */
+  /* HILANGKAN GARIS/BORDER PINGGIR DAN BAYANGAN PADA CETAK PDF */
   .a4-page-view {
     width: 210mm !important;
     height: 297mm !important;
@@ -59,6 +59,7 @@
     padding: 20mm !important;
     box-shadow: none !important;
     border: none !important;
+    outline: none !important;
     background-color: #ffffff !important;
     background: #ffffff !important;
     page-break-after: always !important;
@@ -66,7 +67,7 @@
     overflow: hidden !important;
   }
 
-  /* Hilangkan margin/header-footer bawaan browser */
+  /* Hilangkan margin/header-footer bawaan browser (seperti URL link di bawah) */
   @page {
     size: A4 portrait;
     margin: 0mm !important;
