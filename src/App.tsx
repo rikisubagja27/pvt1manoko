@@ -52,6 +52,8 @@ import {
   ClipboardList,
   Cloud,
   Download,
+  EyeOff,
+  Eye,
 } from 'lucide-react';
 
 import { generateWordReport } from './utils/wordExport';
@@ -63,6 +65,9 @@ export default function App() {
   const [selectedMonth, setSelectedMonth] = useState<number>(7); 
   const [selectedQuarter, setSelectedQuarter] = useState<number>(3); 
   const [selectedYear, setSelectedYear] = useState<number>(2026);
+
+  // State untuk tombol Hide pada bagian Pemilihan Periode
+  const [isPeriodHidden, setIsPeriodHidden] = useState<boolean>(false);
 
   const [logbookEntries, setLogbookEntries] = useState<DailyLogbookEntry[]>(DEFAULT_LOGBOOK_ENTRIES);
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
@@ -153,7 +158,6 @@ export default function App() {
 
   const handlePrint = () => window.print();
 
-  // PERBAIKAN DOWNLOAD WORD UNTUK HP
   const handleExportWord = async () => {
     try {
       setIsExportingWord(true);
@@ -169,7 +173,6 @@ export default function App() {
       document.body.appendChild(a);
       a.click();
       
-      // Memberikan jeda waktu (timeout) agar browser HP sempat memproses download sebelum elemen dihapus
       setTimeout(() => {
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
@@ -177,8 +180,7 @@ export default function App() {
 
     } catch (err: any) {
       console.error('Failed to export Word document:', err);
-      // Menampilkan popup error jika gagal memproses file Word (misal karena gambar base64 tidak valid)
-      alert('Gagal mendownload file Word. Pastikan format logo sudah benar. Error: ' + err.message);
+      alert('Gagal mendownload file Word. Error: ' + err.message);
     } finally {
       setIsExportingWord(false);
     }
@@ -209,7 +211,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0B4F47] to-[#0A192F] text-slate-200 flex flex-col font-sans select-text">
       
-      {/* Top Application Header - Tema Transparan Menyatu dengan Gradasi */}
+      {/* Top Application Header */}
       <header className="bg-slate-900/40 backdrop-blur-md border-b border-white/10 sticky top-0 z-30 shadow-sm no-print">
         <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6 flex flex-col gap-4">
           
@@ -266,84 +268,98 @@ export default function App() {
             </div>
           </div>
 
-          {/* BARIS 2: Tab Toggle (Hanya Isi Logbook & Laporan A4) */}
-          <div className="flex items-center bg-black/20 p-1 rounded-xl border border-white/10 w-fit">
-            <button
-              type="button"
-              onClick={() => setActiveTab('logbook')}
-              className={`flex items-center space-x-2 px-4 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-                activeTab === 'logbook' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-300 hover:text-white'
-              }`}
-            >
-              <ClipboardList className="w-4 h-4" />
-              <span>Isi Logbook</span>
-              <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${activeTab === 'logbook' ? 'bg-emerald-800 text-emerald-100' : 'bg-white/10 text-slate-300'}`}>
-                {logbookEntries.length}
-              </span>
-            </button>
+          {/* BARIS 2: Tab Toggle & Tombol Hide Periode di Ujung Kanan */}
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center bg-black/20 p-1 rounded-xl border border-white/10 w-fit">
+              <button
+                type="button"
+                onClick={() => setActiveTab('logbook')}
+                className={`flex items-center space-x-2 px-4 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                  activeTab === 'logbook' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-300 hover:text-white'
+                }`}
+              >
+                <ClipboardList className="w-4 h-4" />
+                <span>Isi Logbook</span>
+                <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${activeTab === 'logbook' ? 'bg-emerald-800 text-emerald-100' : 'bg-white/10 text-slate-300'}`}>
+                  {logbookEntries.length}
+                </span>
+              </button>
 
-            <button
-              type="button"
-              onClick={() => setActiveTab('report')}
-              className={`flex items-center space-x-2 px-4 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-                activeTab === 'report' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-300 hover:text-white'
-              }`}
-            >
-              <FileText className="w-4 h-4" />
-              <span>Laporan A4</span>
-            </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('report')}
+                className={`flex items-center space-x-2 px-4 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                  activeTab === 'report' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-300 hover:text-white'
+                }`}
+              >
+                <FileText className="w-4 h-4" />
+                <span>Laporan A4</span>
+              </button>
+            </div>
+
+            {/* Tombol Hide / Show Periode (Hanya tampil di tab laporan) */}
+            {activeTab === 'report' && (
+              <button
+                type="button"
+                onClick={() => setIsPeriodHidden(!isPeriodHidden)}
+                className="flex items-center space-x-1.5 px-3 py-1.5 bg-black/30 hover:bg-black/50 text-slate-200 border border-white/10 rounded-xl text-xs font-semibold transition-all cursor-pointer shadow-sm"
+              >
+                {isPeriodHidden ? <Eye className="w-3.5 h-3.5 text-emerald-400" /> : <EyeOff className="w-3.5 h-3.5 text-amber-400" />}
+                <span>{isPeriodHidden ? 'Show Periode' : 'Hide'}</span>
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Secondary Toolbar: Pemilihan Periode */}
-        {activeTab === 'report' && (
+        {/* Secondary Toolbar: Pemilihan Periode (Bisa disembunyikan via tombol Hide) */}
+        {activeTab === 'report' && !isPeriodHidden && (
           <PeriodSelector
             periodType={periodType} setPeriodType={setPeriodType} selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} selectedQuarter={selectedQuarter} setSelectedQuarter={setSelectedQuarter} selectedYear={selectedYear} setSelectedYear={setSelectedYear} activeSummary={activeSummary}
           />
         )}
 
-        {/* Secondary Toolbar: Editor & Download/Print Buttons */}
+        {/* Secondary Toolbar: Editor & Download/Print Buttons (Dibuat rapi horizontal ke samping) */}
         {activeTab === 'report' && (
           <div className="bg-black/20 px-4 py-2.5 border-t border-white/10 text-xs backdrop-blur-md">
-            <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 overflow-x-auto">
               
-              <div className="flex flex-wrap items-center gap-2">
-                <button type="button" onClick={() => setIsActivityModalOpen(true)} className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 rounded-lg border border-white/10 shadow-sm transition-colors cursor-pointer font-medium">
-                  <ListPlus className="w-4 h-4 text-cyan-400" />
+              {/* Grup Tombol Aksi Kiri & Tengah (Dirapikan sebaris ke samping tanpa memakan banyak ruang ke bawah) */}
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                <button type="button" onClick={() => setIsActivityModalOpen(true)} className="flex items-center space-x-1 px-2.5 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 rounded-lg border border-white/10 shadow-sm transition-colors cursor-pointer font-medium whitespace-nowrap">
+                  <ListPlus className="w-3.5 h-3.5 text-cyan-400" />
                   <span>Kustom Tabel 1</span>
                 </button>
-                <button type="button" onClick={() => setIsPhotoModalOpen(true)} className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 rounded-lg border border-white/10 shadow-sm transition-colors cursor-pointer font-medium">
-                  <Camera className="w-4 h-4 text-amber-400" />
+                <button type="button" onClick={() => setIsPhotoModalOpen(true)} className="flex items-center space-x-1 px-2.5 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 rounded-lg border border-white/10 shadow-sm transition-colors cursor-pointer font-medium whitespace-nowrap">
+                  <Camera className="w-3.5 h-3.5 text-amber-400" />
                   <span>Tambah Foto</span>
                 </button>
-                <button type="button" onClick={() => setIsSignatureModalOpen(true)} className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 rounded-lg border border-white/10 shadow-sm transition-colors cursor-pointer font-medium">
-                  <PenTool className="w-4 h-4 text-purple-400" />
+                <button type="button" onClick={() => setIsSignatureModalOpen(true)} className="flex items-center space-x-1 px-2.5 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 rounded-lg border border-white/10 shadow-sm transition-colors cursor-pointer font-medium whitespace-nowrap">
+                  <PenTool className="w-3.5 h-3.5 text-purple-400" />
                   <span>Tanda Tangan</span>
+                </button>
+
+                <div className="w-px h-5 bg-white/10 mx-1 hidden sm:block"></div>
+
+                <button type="button" onClick={handleExportWord} disabled={isExportingWord} className="flex items-center space-x-1 bg-blue-600 hover:bg-blue-500 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm disabled:opacity-50 cursor-pointer whitespace-nowrap">
+                  <FileDown className="w-3.5 h-3.5 text-blue-100" />
+                  <span>Word</span>
+                </button>
+                <button type="button" onClick={handleExportPdf} disabled={isExportingPdf} className="flex items-center space-x-1 bg-rose-600 hover:bg-rose-500 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm disabled:opacity-50 cursor-pointer whitespace-nowrap">
+                  <Download className="w-3.5 h-3.5 text-rose-100" />
+                  <span>PDF</span>
+                </button>
+                <button type="button" onClick={() => setTimeout(() => handlePrint(), 100)} className="flex items-center space-x-1 bg-slate-700 hover:bg-slate-600 text-slate-100 border border-slate-500 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap">
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>Cetak</span>
                 </button>
               </div>
 
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="flex items-center gap-2 pr-3 border-r border-white/10">
-                  <button type="button" onClick={handleExportWord} disabled={isExportingWord} className="flex items-center space-x-1 bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm disabled:opacity-50 cursor-pointer">
-                    <FileDown className="w-4 h-4 text-blue-100" />
-                    <span>Word</span>
-                  </button>
-                  <button type="button" onClick={handleExportPdf} disabled={isExportingPdf} className="flex items-center space-x-1 bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm disabled:opacity-50 cursor-pointer">
-                    <Download className="w-4 h-4 text-rose-100" />
-                    <span>PDF</span>
-                  </button>
-                  <button type="button" onClick={() => setTimeout(() => handlePrint(), 100)} className="flex items-center space-x-1 bg-slate-700 hover:bg-slate-600 text-slate-100 border border-slate-500 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm cursor-pointer">
-                    <Printer className="w-4 h-4" />
-                    <span>Cetak</span>
-                  </button>
-                </div>
-
-                <div className="flex items-center space-x-1 bg-slate-900/60 p-1 rounded-lg border border-white/10 shadow-sm text-slate-200">
-                  <button type="button" onClick={() => setZoomLevel((prev) => Math.max(50, prev - 10))} className="p-1 hover:bg-slate-700 rounded cursor-pointer"><ZoomOut className="w-4 h-4" /></button>
-                  <span className="text-[11px] font-bold px-1.5 min-w-10 text-center">{zoomLevel}%</span>
-                  <button type="button" onClick={() => setZoomLevel((prev) => Math.min(150, prev + 10))} className="p-1 hover:bg-slate-700 rounded cursor-pointer"><ZoomIn className="w-4 h-4" /></button>
-                  <button type="button" onClick={() => setZoomLevel(100)} className="p-1 hover:bg-slate-700 rounded cursor-pointer ml-1"><Maximize2 className="w-4 h-4" /></button>
-                </div>
+              {/* Grup Zoom Kanan */}
+              <div className="flex items-center space-x-1 bg-slate-900/60 p-1 rounded-lg border border-white/10 shadow-sm text-slate-200 shrink-0 ml-auto">
+                <button type="button" onClick={() => setZoomLevel((prev) => Math.max(50, prev - 10))} className="p-1 hover:bg-slate-700 rounded cursor-pointer" title="Perkecil"><ZoomOut className="w-3.5 h-3.5" /></button>
+                <span className="text-[11px] font-bold px-1 min-w-8 text-center">{zoomLevel}%</span>
+                <button type="button" onClick={() => setZoomLevel((prev) => Math.min(150, prev + 10))} className="p-1 hover:bg-slate-700 rounded cursor-pointer" title="Perbesar"><ZoomIn className="w-3.5 h-3.5" /></button>
+                <button type="button" onClick={() => setZoomLevel(100)} className="p-1 hover:bg-slate-700 rounded cursor-pointer" title="Reset"><Maximize2 className="w-3.5 h-3.5" /></button>
               </div>
             </div>
           </div>
