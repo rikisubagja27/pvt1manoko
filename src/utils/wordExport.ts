@@ -13,7 +13,10 @@ import {
   ImageRun,
 } from 'docx';
 
-// Fungsi bantuan untuk mengambil gambar dari URL menjadi Buffer agar bisa masuk ke Word
+// 1. TEMPELKAN KODE BASE64 LOGO KEMENTAN ANDA DI SINI
+// Ganti teks "data:image/png;base64,..." di bawah dengan hasil konversi Base64 dari gambar logo Anda
+const KEMENTAN_LOGO_BASE64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="; 
+
 async function fetchImageBuffer(url: string): Promise<ArrayBuffer | null> {
   try {
     if (!url) return null;
@@ -39,7 +42,26 @@ async function fetchImageBuffer(url: string): Promise<ArrayBuffer | null> {
 export async function generateWordReport(data: any): Promise<Blob> {
   const { periodTitleCaps, periodLabelNormal, year, profile, activities, photos, endDateStr } = data;
 
-  // 1. Proses Data Foto Secara Asinkron Sebelum Membuat Dokumen
+  // Proses Logo Kementan
+  const logoBuffer = await fetchImageBuffer(KEMENTAN_LOGO_BASE64);
+  let coverLogoParagraph;
+  
+  if (logoBuffer) {
+    coverLogoParagraph = new Paragraph({
+      alignment: AlignmentType.CENTER,
+      children: [
+        new ImageRun({
+          data: logoBuffer,
+          transformation: { width: 150, height: 150 }, 
+        }),
+      ],
+      spacing: { after: 400 },
+    });
+  } else {
+    coverLogoParagraph = new Paragraph({ text: "" });
+  }
+
+  // Proses Data Foto Dokumentasi
   const photoRows = [];
   if (photos && photos.length > 0) {
     for (const photo of photos) {
@@ -52,13 +74,13 @@ export async function generateWordReport(data: any): Promise<Blob> {
           children: [
             new ImageRun({
               data: imgBuffer,
-              transformation: { width: 250, height: 250 }, // Ukuran foto di Word
+              transformation: { width: 250, height: 250 }, 
             }),
           ],
         });
       } else {
         photoCellContent = new Paragraph({
-          text: "[Gambar tidak dapat dimuat / Tempel Gambar Di Sini]",
+          text: "[Gambar tidak dapat dimuat]",
           alignment: AlignmentType.CENTER,
         });
       }
@@ -95,8 +117,18 @@ export async function generateWordReport(data: any): Promise<Blob> {
     );
   }
 
-  // 2. Pembuatan Dokumen Word
+  // Pengaturan Dokumen (Mengatur Default Font Arial)
   const doc = new Document({
+    styles: {
+      default: {
+        document: {
+          run: {
+            font: "Arial",
+            size: 24, // 12pt
+          },
+        },
+      },
+    },
     sections: [
       {
         properties: {},
@@ -104,41 +136,30 @@ export async function generateWordReport(data: any): Promise<Blob> {
           // ==========================================
           // HALAMAN SAMPUL (COVER)
           // ==========================================
-          new Paragraph({ text: "", spacing: { before: 2000 } }), 
+          new Paragraph({ text: "", spacing: { before: 1000 } }), 
 
-          // (TEMPAT LOGO) 
-          new Paragraph({
-            alignment: AlignmentType.CENTER,
-            children: [
-              new TextRun({
-                text: "[ TEMPEL LOGO KEMENTAN DI SINI ]", 
-                bold: true,
-                color: "888888",
-              }),
-            ],
-            spacing: { after: 1000 },
-          }),
+          coverLogoParagraph,
 
           new Paragraph({
             alignment: AlignmentType.CENTER,
             children: [
-              new TextRun({ text: "LAPORAN KINERJA", bold: true, size: 32 }), // 16pt
+              new TextRun({ text: "LAPORAN KINERJA", font: "Arial MT", bold: true, size: 32 }), // 16pt
             ],
           }),
           new Paragraph({
             alignment: AlignmentType.CENTER,
             children: [
-              new TextRun({ text: "PELAKSANAAN TUGAS OPERASIONAL KANTOR", bold: true, size: 28 }), // 14pt
+              new TextRun({ text: "PELAKSANAAN TUGAS OPERASIONAL KANTOR", font: "Arial MT", bold: true, size: 28 }), // 14pt
             ],
           }),
           new Paragraph({
             alignment: AlignmentType.CENTER,
             children: [
-              new TextRun({ text: `${periodTitleCaps} TAHUN ${year}`, bold: true, size: 28 }),
+              new TextRun({ text: `${periodTitleCaps} TAHUN ${year}`, font: "Arial MT", bold: true, size: 28 }),
             ],
           }),
 
-          new Paragraph({ text: "", spacing: { before: 3000, after: 2000 } }), // Spasi Kosong
+          new Paragraph({ text: "", spacing: { before: 3000, after: 2000 } }), 
 
           new Paragraph({
             alignment: AlignmentType.CENTER,
@@ -146,7 +167,7 @@ export async function generateWordReport(data: any): Promise<Blob> {
           }),
           new Paragraph({
             alignment: AlignmentType.CENTER,
-            children: [new TextRun({ text: profile?.nama || "[Nama Anda]", bold: true, size: 24 })],
+            children: [new TextRun({ text: profile?.nama || "[Nama Anda]", font: "Arial MT", bold: true, size: 24 })],
           }),
           new Paragraph({
             alignment: AlignmentType.CENTER,
@@ -162,19 +183,19 @@ export async function generateWordReport(data: any): Promise<Blob> {
           new Paragraph({
             alignment: AlignmentType.CENTER,
             children: [
-              new TextRun({ text: "PUSAT PELINDUNGAN VARIETAS TANAMAN", bold: true, size: 24 }),
+              new TextRun({ text: "PUSAT PELINDUNGAN VARIETAS TANAMAN", font: "Arial MT", bold: true, size: 24 }),
             ],
           }),
           new Paragraph({
             alignment: AlignmentType.CENTER,
             children: [
-              new TextRun({ text: "DAN PERIZINAN PERTANIAN", bold: true, size: 24 }),
+              new TextRun({ text: "DAN PERIZINAN PERTANIAN", font: "Arial MT", bold: true, size: 24 }),
             ],
           }),
           new Paragraph({
             alignment: AlignmentType.CENTER,
             children: [
-              new TextRun({ text: `${year}`, bold: true, size: 24 }),
+              new TextRun({ text: `${year}`, font: "Arial MT", bold: true, size: 24 }),
             ],
             pageBreakBefore: false,
           }),
@@ -185,17 +206,17 @@ export async function generateWordReport(data: any): Promise<Blob> {
           new Paragraph({
             pageBreakBefore: true,
             alignment: AlignmentType.CENTER,
-            children: [new TextRun({ text: "BAB I", bold: true, size: 28 })],
+            children: [new TextRun({ text: "BAB I", font: "Arial MT", bold: true, size: 28 })],
           }),
           new Paragraph({
             alignment: AlignmentType.CENTER,
-            children: [new TextRun({ text: "PENDAHULUAN", bold: true, size: 28 })],
+            children: [new TextRun({ text: "PENDAHULUAN", font: "Arial MT", bold: true, size: 28 })],
             spacing: { after: 400 },
           }),
 
-          new Paragraph({ children: [new TextRun({ text: "1.1 LATAR BELAKANG", bold: true, size: 24 })], spacing: { after: 100 } }),
+          new Paragraph({ children: [new TextRun({ text: "1.1 LATAR BELAKANG", font: "Arial MT", bold: true, size: 24 })], spacing: { after: 100 } }),
           new Paragraph({
-            alignment: AlignmentType.JUSTIFIED, // Rata Kiri Kanan
+            alignment: AlignmentType.JUSTIFIED, 
             children: [
               new TextRun({ text: "Dalam rangka mendukung kelancaran pelaksanaan tugas dan fungsi organisasi, diperlukan dukungan sumber daya manusia yang mampu melaksanakan kegiatan operasional dan pelayanan perkantoran secara efektif, tertib, dan berkesinambungan. Salah satu bentuk dukungan tersebut dilaksanakan melalui penempatan PPPK Paruh Waktu pada jabatan Operator Layanan Operasional.", size: 24 }),
             ],
@@ -209,7 +230,7 @@ export async function generateWordReport(data: any): Promise<Blob> {
             spacing: { after: 400 },
           }),
 
-          new Paragraph({ children: [new TextRun({ text: "1.2 TUJUAN", bold: true, size: 24 })], spacing: { after: 100 } }),
+          new Paragraph({ children: [new TextRun({ text: "1.2 TUJUAN", font: "Arial MT", bold: true, size: 24 })], spacing: { after: 100 } }),
           new Paragraph({
             alignment: AlignmentType.JUSTIFIED,
             children: [
@@ -218,7 +239,7 @@ export async function generateWordReport(data: any): Promise<Blob> {
             spacing: { after: 400 },
           }),
 
-          new Paragraph({ children: [new TextRun({ text: "1.3 WAKTU PELAKSANAAN", bold: true, size: 24 })], spacing: { after: 100 } }),
+          new Paragraph({ children: [new TextRun({ text: "1.3 WAKTU PELAKSANAAN", font: "Arial MT", bold: true, size: 24 })], spacing: { after: 100 } }),
           new Paragraph({
             alignment: AlignmentType.JUSTIFIED,
             children: [
@@ -228,20 +249,20 @@ export async function generateWordReport(data: any): Promise<Blob> {
           }),
 
           // ==========================================
-          // BAB II : AKUNTABILITAS KINERJA (TABEL DINAMIS)
+          // BAB II : AKUNTABILITAS KINERJA
           // ==========================================
           new Paragraph({
             pageBreakBefore: true,
             alignment: AlignmentType.CENTER,
-            children: [new TextRun({ text: "BAB II", bold: true, size: 28 })],
+            children: [new TextRun({ text: "BAB II", font: "Arial MT", bold: true, size: 28 })],
           }),
           new Paragraph({
             alignment: AlignmentType.CENTER,
-            children: [new TextRun({ text: "AKUNTABILITAS KINERJA", bold: true, size: 28 })],
+            children: [new TextRun({ text: "AKUNTABILITAS KINERJA", font: "Arial MT", bold: true, size: 28 })],
             spacing: { after: 400 },
           }),
 
-          new Paragraph({ children: [new TextRun({ text: "2.1 HASIL PELAKSANAAN", bold: true, size: 24 })], spacing: { after: 100 } }),
+          new Paragraph({ children: [new TextRun({ text: "2.1 HASIL PELAKSANAAN", font: "Arial MT", bold: true, size: 24 })], spacing: { after: 100 } }),
           new Paragraph({ children: [new TextRun({ text: "Kegiatan Operator Layanan Operasional", size: 24 })], spacing: { after: 200 } }),
           
           new Paragraph({
@@ -249,7 +270,7 @@ export async function generateWordReport(data: any): Promise<Blob> {
             spacing: { after: 100 },
           }),
 
-          // TABEL 1 : RINCIAN KEGIATAN LOGBOOK
+          // TABEL 1
           new Table({
             width: { size: 100, type: WidthType.PERCENTAGE },
             borders: {
@@ -261,7 +282,6 @@ export async function generateWordReport(data: any): Promise<Blob> {
               insideVertical: { style: BorderStyle.SINGLE, size: 1 },
             },
             rows: [
-              // Header Tabel 1
               new TableRow({
                 tableHeader: true,
                 children: [
@@ -271,18 +291,15 @@ export async function generateWordReport(data: any): Promise<Blob> {
                   new TableCell({ width: { size: 20, type: WidthType.PERCENTAGE }, children: [new Paragraph({ text: "Keterangan", alignment: AlignmentType.CENTER, style: "Strong" })] }),
                 ],
               }),
-              
-              // Looping Data Logbook
               ...(activities && activities.length > 0 ? activities.map((act: any, index: number) => {
                 const tanggalText = act.tanggalStr || act.waktu || act.tanggal || "-";
                 const uraianText = act.uraianPekerjaan || act.kegiatan || act.uraian || "-";
                 const ketText = act.keterangan || act.lokasiBlok || "-";
-
                 return new TableRow({
                   children: [
                     new TableCell({ children: [new Paragraph({ text: (index + 1).toString(), alignment: AlignmentType.CENTER })] }),
                     new TableCell({ children: [new Paragraph({ text: tanggalText })] }),
-                    new TableCell({ children: [new Paragraph({ text: uraianText, alignment: AlignmentType.JUSTIFIED })] }), // Rata kiri kanan di uraian
+                    new TableCell({ children: [new Paragraph({ text: uraianText, alignment: AlignmentType.JUSTIFIED })] }), 
                     new TableCell({ children: [new Paragraph({ text: ketText })] }),
                   ],
                 });
@@ -301,7 +318,7 @@ export async function generateWordReport(data: any): Promise<Blob> {
 
           new Paragraph({ text: "", spacing: { before: 400, after: 200 } }),
 
-          // TABEL 2 : DOKUMENTASI FOTO
+          // TABEL 2 
           new Paragraph({
             children: [new TextRun({ text: "Tabel 2. Dokumentasi Kegiatan", size: 24 })],
             spacing: { after: 100 },
@@ -324,7 +341,7 @@ export async function generateWordReport(data: any): Promise<Blob> {
                   new TableCell({ children: [new Paragraph({ text: "Keterangan", alignment: AlignmentType.CENTER, style: "Strong" })] }),
                 ],
               }),
-              ...photoRows, // Memasukkan baris foto yang sudah diproses di atas
+              ...photoRows, 
             ],
           }),
 
@@ -334,16 +351,16 @@ export async function generateWordReport(data: any): Promise<Blob> {
           new Paragraph({
             pageBreakBefore: true,
             alignment: AlignmentType.CENTER,
-            children: [new TextRun({ text: "BAB III", bold: true, size: 28 })],
+            children: [new TextRun({ text: "BAB III", font: "Arial MT", bold: true, size: 28 })],
           }),
           new Paragraph({
             alignment: AlignmentType.CENTER,
-            children: [new TextRun({ text: "PENUTUP", bold: true, size: 28 })],
+            children: [new TextRun({ text: "PENUTUP", font: "Arial MT", bold: true, size: 28 })],
             spacing: { after: 400 },
           }),
 
           new Paragraph({
-            alignment: AlignmentType.JUSTIFIED, // Rata Kiri Kanan
+            alignment: AlignmentType.JUSTIFIED, 
             children: [
               new TextRun({ text: `Pada ${periodLabelNormal} Tahun ${year}, pelaksanaan tugas PPPK Paruh Waktu jabatan Operator Layanan Operasional telah mendukung kelancaran operasional KPS PVT I Manoko. Kegiatan utama meliputi pengolahan lahan, pemeliharaan, penyiraman, penyiangan dan pengendalian gulma, panen dan penanganan hasil panen, serta pelaksanaan uji BUSS, pembersihan area kerja, pemeliharaan sarana pendukung, dan dukungan kegiatan lainnya yang berhubungan dengan kegiatan operasional kebun. Secara umum kegiatan terlaksana secara tertib, efektif, dan sesuai dengan tugas serta mendukung pencapaian tujuan dan kelancaran tugas organisasi.`, size: 24 }),
             ],
@@ -354,10 +371,10 @@ export async function generateWordReport(data: any): Promise<Blob> {
             children: [
               new TextRun({ text: "Demikian laporan ini disampaikan. Atas perhatian dan kerjasamanya, diucapkan terima kasih.", size: 24 }),
             ],
-            spacing: { after: 800 }, // Jarak untuk tanda tangan
+            spacing: { after: 800 }, 
           }),
 
-          // TANDA TANGAN (Rata Kanan)
+          // TANDA TANGAN 
           new Paragraph({
             alignment: AlignmentType.RIGHT,
             children: [new TextRun({ text: `Bandung Barat, ${endDateStr || '30 Juni 2026'}`, size: 24 })],
@@ -365,11 +382,11 @@ export async function generateWordReport(data: any): Promise<Blob> {
           new Paragraph({
             alignment: AlignmentType.RIGHT,
             children: [new TextRun({ text: "Operator Layanan Operasional", size: 24 })],
-            spacing: { after: 1200 }, // Ruang kosong untuk tanda tangan pena
+            spacing: { after: 1200 }, 
           }),
           new Paragraph({
             alignment: AlignmentType.RIGHT,
-            children: [new TextRun({ text: profile?.nama || "[Nama Anda]", bold: true, size: 24 })],
+            children: [new TextRun({ text: profile?.nama || "[Nama Anda]", font: "Arial MT", bold: true, size: 24 })],
           }),
           new Paragraph({
             alignment: AlignmentType.RIGHT,
