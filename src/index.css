@@ -35,7 +35,7 @@
     print-color-adjust: exact !important;
   }
 
-  /* Hide navigation, toolbars, modals, floating buttons */
+  /* Sembunyikan elemen navigasi, header, dan tombol hanya saat dicetak */
   .no-print, header, nav, button, .app-header {
     display: none !important;
     visibility: hidden !important;
@@ -66,16 +66,7 @@
     overflow: hidden !important;
   }
 
-  /* Sembunyikan elemen apapun di luar kontainer laporan utama */
-  body > *:not(#root) {
-    display: none !important;
-  }
-
-  #root > *:not(main) {
-    display: none !important;
-  }
-
-  /* ATURAN UTAMA: Mematikan Header & Footer / Watermark Link bawaan browser */
+  /* Hilangkan margin/header-footer bawaan browser */
   @page {
     size: A4 portrait;
     margin: 0mm !important;
