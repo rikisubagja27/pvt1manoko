@@ -66,7 +66,6 @@ export default function App() {
   const [selectedQuarter, setSelectedQuarter] = useState<number>(3); 
   const [selectedYear, setSelectedYear] = useState<number>(2026);
 
-  // State untuk tombol Hide pada bagian Pemilihan Periode
   const [isPeriodHidden, setIsPeriodHidden] = useState<boolean>(false);
 
   const [logbookEntries, setLogbookEntries] = useState<DailyLogbookEntry[]>(DEFAULT_LOGBOOK_ENTRIES);
@@ -297,7 +296,6 @@ export default function App() {
               </button>
             </div>
 
-            {/* Tombol Hide / Show Periode (Hanya tampil di tab laporan) */}
             {activeTab === 'report' && (
               <button
                 type="button"
@@ -311,19 +309,18 @@ export default function App() {
           </div>
         </div>
 
-        {/* Secondary Toolbar: Pemilihan Periode (Bisa disembunyikan via tombol Hide) */}
+        {/* Secondary Toolbar: Pemilihan Periode */}
         {activeTab === 'report' && !isPeriodHidden && (
           <PeriodSelector
             periodType={periodType} setPeriodType={setPeriodType} selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} selectedQuarter={selectedQuarter} setSelectedQuarter={setSelectedQuarter} selectedYear={selectedYear} setSelectedYear={setSelectedYear} activeSummary={activeSummary}
           />
         )}
 
-        {/* Secondary Toolbar: Editor & Download/Print Buttons (Dibuat rapi horizontal ke samping) */}
+        {/* Secondary Toolbar: Editor & Download/Print Buttons (Zoom digabung di sebelah Cetak) */}
         {activeTab === 'report' && (
           <div className="bg-black/20 px-4 py-2.5 border-t border-white/10 text-xs backdrop-blur-md">
             <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 overflow-x-auto">
               
-              {/* Grup Tombol Aksi Kiri & Tengah (Dirapikan sebaris ke samping tanpa memakan banyak ruang ke bawah) */}
               <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                 <button type="button" onClick={() => setIsActivityModalOpen(true)} className="flex items-center space-x-1 px-2.5 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 rounded-lg border border-white/10 shadow-sm transition-colors cursor-pointer font-medium whitespace-nowrap">
                   <ListPlus className="w-3.5 h-3.5 text-cyan-400" />
@@ -352,15 +349,16 @@ export default function App() {
                   <Printer className="w-3.5 h-3.5" />
                   <span>Cetak</span>
                 </button>
+
+                {/* Tombol Zoom dipindahkan ke samping Cetak */}
+                <div className="flex items-center space-x-1 bg-slate-900/60 p-1 rounded-lg border border-white/10 shadow-sm text-slate-200 ml-1">
+                  <button type="button" onClick={() => setZoomLevel((prev) => Math.max(50, prev - 10))} className="p-1 hover:bg-slate-700 rounded cursor-pointer" title="Perkecil"><ZoomOut className="w-3.5 h-3.5" /></button>
+                  <span className="text-[11px] font-bold px-1 min-w-8 text-center">{zoomLevel}%</span>
+                  <button type="button" onClick={() => setZoomLevel((prev) => Math.min(150, prev + 10))} className="p-1 hover:bg-slate-700 rounded cursor-pointer" title="Perbesar"><ZoomIn className="w-3.5 h-3.5" /></button>
+                  <button type="button" onClick={() => setZoomLevel(100)} className="p-1 hover:bg-slate-700 rounded cursor-pointer" title="Reset"><Maximize2 className="w-3.5 h-3.5" /></button>
+                </div>
               </div>
 
-              {/* Grup Zoom Kanan */}
-              <div className="flex items-center space-x-1 bg-slate-900/60 p-1 rounded-lg border border-white/10 shadow-sm text-slate-200 shrink-0 ml-auto">
-                <button type="button" onClick={() => setZoomLevel((prev) => Math.max(50, prev - 10))} className="p-1 hover:bg-slate-700 rounded cursor-pointer" title="Perkecil"><ZoomOut className="w-3.5 h-3.5" /></button>
-                <span className="text-[11px] font-bold px-1 min-w-8 text-center">{zoomLevel}%</span>
-                <button type="button" onClick={() => setZoomLevel((prev) => Math.min(150, prev + 10))} className="p-1 hover:bg-slate-700 rounded cursor-pointer" title="Perbesar"><ZoomIn className="w-3.5 h-3.5" /></button>
-                <button type="button" onClick={() => setZoomLevel(100)} className="p-1 hover:bg-slate-700 rounded cursor-pointer" title="Reset"><Maximize2 className="w-3.5 h-3.5" /></button>
-              </div>
             </div>
           </div>
         )}
