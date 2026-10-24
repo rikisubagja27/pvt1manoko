@@ -35,7 +35,7 @@
     print-color-adjust: exact !important;
   }
 
-  /* Sembunyikan navigasi, header, dan tombol saat dicetak */
+  /* Sembunyikan navigasi, header, dan tombol HANYA saat dicetak */
   .no-print, header, nav, button, .app-header {
     display: none !important;
     visibility: hidden !important;
@@ -49,7 +49,7 @@
     background: white !important;
   }
 
-  /* HILANGKAN GARIS/BORDER PINGGIR DAN BAYANGAN PADA CETAK PDF */
+  /* Hilangkan garis border dan bayangan pada cetak PDF */
   .a4-page-view {
     width: 210mm !important;
     height: 297mm !important;
@@ -67,10 +67,10 @@
     overflow: hidden !important;
   }
 
-  /* Hilangkan margin/header-footer bawaan browser (seperti URL link di bawah) */
+  /* Pengaturan halaman cetak untuk iPhone */
   @page {
     size: A4 portrait;
-    margin: 0mm !important;
+    margin: 5mm !important;
   }
 }
 
